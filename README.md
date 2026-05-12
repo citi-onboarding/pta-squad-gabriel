@@ -125,7 +125,7 @@ Certifique-se de ter instalado antes de começar:
 
 ### Rodando Server
 
-1. Com o Docker Desktop aberto, suba o banco (deixe esse terminal rodando):
+1. Com o Docker Desktop aberto, suba o banco e o servidor (deixe esse terminal rodando):
 
    ```bash
    docker compose up
@@ -138,10 +138,6 @@ Certifique-se de ter instalado antes de começar:
    ```
    > Ao aparecer `Enter a name for the new migration:`, digite algo como `init`.  
    > Rode esse comando novamente sempre que modificar o `schema.prisma`.
-4. Ainda na pasta `/server`, suba o servidor:
-   ```bash
-   pnpm run dev
-   ```
 
 O server estará disponível em `http://localhost:3001`.
 
