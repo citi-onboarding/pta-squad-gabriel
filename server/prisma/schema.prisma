@@ -14,11 +14,49 @@ model User {
   id        Int    @id @default(autoincrement())
   firstName String
   lastName  String
-  age       Int
 }
 
 model Test {
   id   Int    @id @default(autoincrement())
   name String
   age  Int
+}
+enum Categoria {
+  Romance
+  Infantil
+  Tecnologia
+  Historia
+  Ciencias
+}
+
+enum Status {
+  Em_andamento
+  Devolvido
+  Atrasado
+}
+
+model Livro {
+  id                    String       @id @default(uuid())
+  titulo                String
+  autor                 String
+  isbn                  String
+  editora               String
+  ano                   Int
+  quantidade_total      Int
+  quantidade_disponivel Int
+  categoria             Categoria
+  emprestimos           Emprestimo[]
+  createdAt             DateTime     @default(now())
+}
+
+model Emprestimo {
+  id                      String   @id @default(uuid())
+  livroId                 String
+  nome_cliente            String
+  email_cliente           String
+  data_locacao            DateTime
+  data_prevista_devolucao DateTime
+  status                  Status
+  createdAt               DateTime @default(now())
+  livro                   Livro    @relation(fields: [livroId], references: [id])
 }
