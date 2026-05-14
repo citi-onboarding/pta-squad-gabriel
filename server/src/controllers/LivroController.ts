@@ -24,7 +24,8 @@ class LivroController implements Crud {
         return response.status(400).json({ message: "Todos os campos são obrigatórios." });
       }
       //Valida ISBN
-      if (typeof isbn !== "string" || (isbn.length !== 10 && isbn.length !== 13)) {
+      const isbn_regex = /^(?:\d{10}|\d{13})$/; 
+      if (typeof isbn !== "string" || !isbn_regex.test(isbn)) {
         return response.status(400).json({ message: "ISBN inválido." });
       }
 
