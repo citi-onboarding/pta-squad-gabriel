@@ -28,8 +28,10 @@ export default function Navbar() {
         <Button className={pathname === "/livros" ? "bg-green-100 text-green-600 hover:bg-green-200" : "bg-white"} variant="outline">
         <BookOpen/>Livros</Button>
       </Link>
+      <Link href="/livros/novo">
       <Button className="bg-green-500 text-white hover:bg-green-600"> 
       <Plus/>Novo Livro</Button>
+      </Link>
     </div>
     </nav> 
   )
