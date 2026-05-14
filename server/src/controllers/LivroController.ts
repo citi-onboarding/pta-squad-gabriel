@@ -44,7 +44,7 @@ class LivroController implements Crud {
         },
       });
 
-      return response.status(200).json({ message: "Livro cadastrado com sucesso.", livro: createdLivro });
+      return response.status(201).json({ message: "Livro cadastrado com sucesso.", livro: createdLivro });
     } catch (error) {
       return response.status(400).json({ message: "Erro ao cadastrar livro" });
     }
@@ -75,7 +75,7 @@ class LivroController implements Crud {
       };
 
       const livros = await prisma.livro.findMany({where});
-      if (!livros){
+      if (livros.length === 0){
             return response.status(404).json({message: "Nenhum livro encontrado."})
         };
 
