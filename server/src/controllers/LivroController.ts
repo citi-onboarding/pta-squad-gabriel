@@ -75,9 +75,6 @@ class LivroController implements Crud {
       };
 
       const livros = await prisma.livro.findMany({where});
-      if (livros.length === 0){
-            return response.status(404).json({message: "Nenhum livro encontrado."})
-        };
 
       return response.status(200).json(livros);
 
