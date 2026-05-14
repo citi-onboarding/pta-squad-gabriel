@@ -71,10 +71,7 @@ class LivroController implements Crud {
       };
 
       if (categoria) {
-        where.categoria = {
-          contains: String(categoria),
-          mode: "insensitive"
-        }
+        where.categoria = categoria
       };
 
       const livros = await prisma.livro.findMany({where});
