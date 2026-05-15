@@ -2,6 +2,16 @@
 
 import * as React from "react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
+// Imagens das categorias
+import romanceImg from "../../assets/categorias/romance.png";
+import tecnologiaImg from "../../assets/categorias/tecnologia.png";
+import historiaImg from "../../assets/categorias/historia.png";
+import cienciasImg from "../../assets/categorias/ciencias.png";
+import infantilImg from "../../assets/categorias/infantil.png";
 
 //Componente para cadastrar um novo livro
 export default function CadastrarLivro() {
@@ -73,6 +83,14 @@ export default function CadastrarLivro() {
     });
   }
 
+  //Relacionando as imagens a suas categorias
+  const imagensCategorias: { [key: string]: any } = {
+    Romance: romanceImg,
+    Tecnologia: tecnologiaImg,
+    História: historiaImg,
+    Ciências: cienciasImg,
+    Infantil: infantilImg,
+  };
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
       {/* Div geral */}
@@ -90,10 +108,10 @@ export default function CadastrarLivro() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Titulo */}
             <div>
-              <label className="text-sm font-medium text-gray-900">
+              <Label className="text-sm font-medium text-gray-900">
                 Título
-              </label>
-              <input
+              </Label>
+              <Input
                 name="titulo"
                 value={form.titulo}
                 onChange={handleChange}
@@ -109,8 +127,8 @@ export default function CadastrarLivro() {
 
             {/* Autor */}
             <div>
-              <label className="text-sm font-medium text-gray-900">Autor</label>
-              <input
+              <Label className="text-sm font-medium text-gray-900">Autor</Label>
+              <Input
                 name="autor"
                 value={form.autor}
                 onChange={handleChange}
@@ -126,8 +144,8 @@ export default function CadastrarLivro() {
 
             {/* ISBN */}
             <div>
-              <label className="text-sm font-medium text-gray-900">ISBN</label>
-              <input
+              <Label className="text-sm font-medium text-gray-900">ISBN</Label>
+              <Input
                 name="isbn"
                 value={form.isbn}
                 onChange={handleChange}
@@ -143,10 +161,10 @@ export default function CadastrarLivro() {
 
             {/* Editora */}
             <div>
-              <label className="text-sm font-medium text-gray-900">
+              <Label className="text-sm font-medium text-gray-900">
                 Editora
-              </label>
-              <input
+              </Label>
+              <Input
                 name="editora"
                 value={form.editora}
                 onChange={handleChange}
@@ -162,8 +180,8 @@ export default function CadastrarLivro() {
 
             {/* Ano */}
             <div>
-              <label className="text-sm font-medium text-gray-900">Ano</label>
-              <input
+              <Label className="text-sm font-medium text-gray-900">Ano</Label>
+              <Input
                 name="ano"
                 value={form.ano}
                 onChange={handleChange}
@@ -179,10 +197,10 @@ export default function CadastrarLivro() {
 
             {/* Quantidade */}
             <div>
-              <label className="text-sm font-medium text-gray-900">
+              <Label className="text-sm font-medium text-gray-900">
                 Quantidade
-              </label>
-              <input
+              </Label>
+              <Input
                 name="quantidade"
                 value={form.quantidade}
                 onChange={handleChange}
@@ -202,9 +220,9 @@ export default function CadastrarLivro() {
 
           {/* Categorias */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-3 block">
+            <Label className="text-sm font-medium text-gray-700 mb-3 block">
               Categoria
-            </label>
+            </Label>
             {/* Botões de categoria -- Logica para mudar a cor dos botões ao clicar -- coloquei tudo em uma lista ao inves de criar separadamente*/}
             <div className="flex gap-3 flex-wrap">
               {[
@@ -224,8 +242,16 @@ export default function CadastrarLivro() {
                         : "border-gray-300 text-gray-600 hover:border-emerald-400"
                     }`}
                 >
-                  {/* Área vazia em cima -- acho que vai vim uma foto */}
-                  <div className="w-28 h-28 rounded-md border border-gray-200 bg-white" />
+                  {/* Foto */}
+                  <div className="w-28 h-28 rounded-md overflow-hidden">
+                    <Image
+                      src={imagensCategorias[cat]}
+                      alt={cat}
+                      width={112}
+                      height={112}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
                   {/* Nome da categoria */}
                   <span className="text-sm font-medium text-gray-900">
                     {cat}
@@ -246,19 +272,20 @@ export default function CadastrarLivro() {
           {/* Botões */}
           <div className="flex justify-end gap-3">
             {/* Cancelar */}
-            <button
+            <Button
+              variant="outline"
               onClick={handleCancelar}
               className="border border-emerald-500 text-emerald-600 px-5 py-2 rounded-md text-sm hover:bg-emerald-50"
             >
               Cancelar
-            </button>
+            </Button>
             {/* Salvar Livro */}
-            <button
+            <Button
               onClick={handleSubmit}
               className="bg-emerald-500 text-white px-5 py-2 rounded-md text-sm hover:bg-emerald-600"
             >
               Salvar Livro
-            </button>
+            </Button>
           </div>
         </div>
       </div>
