@@ -48,7 +48,10 @@ export default function CadastrarLivro() {
       autor: form.autor === "",
       isbn: !/^\d{10}$|^\d{13}$/.test(form.isbn),
       editora: form.editora === "",
-      ano: form.ano === "",
+      ano:
+        form.ano === "" ||
+        Number(form.ano) < 1000 ||
+        Number(form.ano) > new Date().getFullYear(),
       quantidade: form.quantidade === "",
       categoria: form.categoria === "",
     };
@@ -118,11 +121,13 @@ export default function CadastrarLivro() {
                 placeholder="Digite o título do livro"
                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
-              {erros.titulo && (
-                <p className="text-red-500 text-xs mt-1">
-                  *Este campo é obrigatório
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-xs mt-1 ${
+                  erros.titulo ? "visible" : "invisible"
+                }`}
+              >
+                *Este campo é obrigatório
+              </p>
             </div>
 
             {/* Autor */}
@@ -135,11 +140,13 @@ export default function CadastrarLivro() {
                 placeholder="Digite o nome do autor"
                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
-              {erros.autor && (
-                <p className="text-red-500 text-xs mt-1">
-                  *Este campo é obrigatório
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-xs mt-1 ${
+                  erros.autor ? "visible" : "invisible"
+                }`}
+              >
+                *Este campo é obrigatório
+              </p>
             </div>
 
             {/* ISBN */}
@@ -152,11 +159,13 @@ export default function CadastrarLivro() {
                 placeholder="Digite o ISBN"
                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
-              {erros.isbn && (
-                <p className="text-red-500 text-xs mt-1">
-                  *ISBN deve ter 10 ou 13 dígitos numéricos
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-xs mt-1 ${
+                  erros.isbn ? "visible" : "invisible"
+                }`}
+              >
+                *ISBN deve ter 10 ou 13 dígitos numéricos
+              </p>
             </div>
 
             {/* Editora */}
@@ -171,11 +180,13 @@ export default function CadastrarLivro() {
                 placeholder="Digite a Editora"
                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
-              {erros.editora && (
-                <p className="text-red-500 text-xs mt-1">
-                  *Este campo é obrigatório
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-xs mt-1 ${
+                  erros.editora ? "visible" : "invisible"
+                }`}
+              >
+                *Este campo é obrigatório
+              </p>
             </div>
 
             {/* Ano */}
@@ -185,14 +196,19 @@ export default function CadastrarLivro() {
                 name="ano"
                 value={form.ano}
                 onChange={handleChange}
-                placeholder="Digite a Ano"
+                placeholder="Digite o ano"
+                type="number"
+                min={1000}
+                max={new Date().getFullYear()}
                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
-              {erros.ano && (
-                <p className="text-red-500 text-xs mt-1">
-                  *Este campo é obrigatório
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-xs mt-1 ${
+                  erros.ano ? "visible" : "invisible"
+                }`}
+              >
+                *Ano deve ser entre 1000 e {new Date().getFullYear()}
+              </p>
             </div>
 
             {/* Quantidade */}
@@ -207,11 +223,13 @@ export default function CadastrarLivro() {
                 placeholder="Digite a Quantidade"
                 className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
-              {erros.quantidade && (
-                <p className="text-red-500 text-xs mt-1">
-                  *Este campo é obrigatório
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-xs mt-1 ${
+                  erros.quantidade ? "visible" : "invisible"
+                }`}
+              >
+                *Este campo é obrigatório
+              </p>
             </div>
           </div>
 
@@ -252,18 +270,16 @@ export default function CadastrarLivro() {
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  {/* Nome da categoria */}
-                  <span className="text-sm font-medium text-gray-900">
-                    {cat}
-                  </span>
                 </button>
               ))}
             </div>
-            {erros.categoria && (
-              <p className="text-red-500 text-xs mt-1">
-                *Selecione pelo menos uma categoria
-              </p>
-            )}
+            <p
+              className={`text-red-500 text-xs mt-1 ${
+                erros.categoria ? "visible" : "invisible"
+              }`}
+            >
+              *Selecione pelo menos uma categoria
+            </p>
           </div>
 
           {/* Divisor */}
