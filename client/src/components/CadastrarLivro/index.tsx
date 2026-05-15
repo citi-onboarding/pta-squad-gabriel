@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 // Imagens das categorias
-import romanceImg from "../../assets/categorias/romance.png";
-import tecnologiaImg from "../../assets/categorias/tecnologia.png";
-import historiaImg from "../../assets/categorias/historia.png";
-import cienciasImg from "../../assets/categorias/ciencias.png";
-import infantilImg from "../../assets/categorias/infantil.png";
+import romanceImg from "../../../../assets/categorias/romance.png";
+import tecnologiaImg from "../../../../assets/categorias/tecnologia.png";
+import historiaImg from "../../../../assets/categorias/historia.png";
+import cienciasImg from "../../../../assets/categorias/ciencias.png";
+import infantilImg from "../../../../assets/categorias/infantil.png";
 
 //Componente para cadastrar um novo livro
 export default function CadastrarLivro() {
