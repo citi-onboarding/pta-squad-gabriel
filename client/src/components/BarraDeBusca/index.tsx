@@ -9,12 +9,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
 
 
+type BarraDeBuscarProps = {   
+  filtros: {
+    busca: string
+    categoria: string
+  }
+  onChange: (filtros: { busca: string; categoria: string }) => void
+}
 
-export default function BarraDeBuscar() {
-  const [categoria, setCategoria] = useState("todas");
+
+export default function BarraDeBuscar({ filtros, onChange }: BarraDeBuscarProps) {
+  
   return (
     <div className="max-w-6xl mx-auto mt-24 flex items-center gap-4 bg-white rounded-xl shadow-md p-4">
       
@@ -27,6 +34,8 @@ export default function BarraDeBuscar() {
 
         <Input
           type="text"
+          value={filtros.busca}          
+          onChange={(e) => onChange({ ...filtros, busca: e.target.value })} 
           placeholder="Buscar por título ou autor..."
           className="w-full pl-10 rounded-xl"
         />
@@ -34,8 +43,8 @@ export default function BarraDeBuscar() {
       </div>
 
         <Select 
-        value={categoria}
-        onValueChange={setCategoria}
+        value={filtros.categoria}    
+        onValueChange={(value) => onChange({ ...filtros, categoria: value })}
         >
           <SelectTrigger className="w-[220px] rounded-xl">
             <SelectValue />
