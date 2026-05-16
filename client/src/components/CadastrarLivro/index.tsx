@@ -207,7 +207,7 @@ export default function CadastrarLivro() {
                   erros.ano ? "visible" : "invisible"
                 }`}
               >
-                *Ano deve ser entre 1000 e {new Date().getFullYear()}
+                *Selecione um ano válido
               </p>
             </div>
 
