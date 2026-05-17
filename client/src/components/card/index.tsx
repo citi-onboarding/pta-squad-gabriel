@@ -35,7 +35,7 @@ export default function Card({
 }: CardLivroProps) {
   return (
     // div geral
-    <div className="bg-green-100 border border-gray-350 rounded-xl overflow-hidden shadow-md hover:shadow-lg">
+    <div className="bg-green-100 border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg">
       {/* área da imagem */}
       <div className="w-full h-56 overflow-hidden">
         <Image
