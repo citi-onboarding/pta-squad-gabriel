@@ -45,7 +45,7 @@ model Emprestimo {
   email_cliente           String
   data_locacao            DateTime
   data_prevista_devolucao DateTime
-  status                  Status
+  status                  Status   @default(Em_andamento)
   createdAt               DateTime @default(now())
   livro                   Livro    @relation(fields: [livroId], references: [id])
 }
