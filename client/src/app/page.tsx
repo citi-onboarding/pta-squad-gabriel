@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import { LogoCITi } from '../assets';
-import { Emprestimo } from '../components/modal/emprestimo';
-import type { EmprestDataProps } from '../components/modal/emprestimo';
+import { Emprestimo } from '../components/ModalEmprestimo';
+import type { EmprestDataProps } from '../components/ModalEmprestimo';
 import CadastrarLivro from '@/components/CadastrarLivro';
 
 export default function Home() {

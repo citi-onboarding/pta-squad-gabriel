@@ -53,6 +53,7 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
     let isValid = true;
 
     if (!formData.nome.trim()) {
+      console.log(formData)
       newErrors.nome = "Nome é obrigatório";
       isValid = false;
     }
@@ -79,6 +80,7 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
       isValid = false;
     }
 
+    console.log(newErrors)
     setErrors(newErrors);
     return isValid;
   };
@@ -105,6 +107,12 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
   const handleCancel = () => {
     setOpen(false);
     setErrors({ nome: "", email: "", dataLoc: "", dataDevol: "" });
+    setFormData({
+      nome: "",
+      email: "",
+      dataLoc: new Date().toISOString().split("T")[0],
+      dataDevol: "",
+    });
   };
 
   return (
@@ -118,11 +126,13 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
           <span>Emprestar </span>
         </Button>
       </DialogTrigger>
-      <DialogContent
+
+      { /* Responsividade em width*/ }
+      <DialogContent 
         className="
         w-[95%]           
-        sm:w-[450px]      
-        md:w-[500px]      
+        sm:w-[300px]      
+        md:w-[350px]      
         max-w-[calc(100vw-2rem)]
         max-h-[90vh]      
         overflow-y-auto
@@ -144,7 +154,7 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
 
         <div className="px-5 py-4 space-y-4">
           {/* Livro selecionado */}
-          <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-3">
+          <div className="rounded-lg border-gray-100 bg-gray-50 px-3 py-3">
             <Label className="text-gray-500 font-normal">
               Livro selecionado
             </Label>
@@ -158,6 +168,10 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
               id="nome"
               type="text"
               placeholder="Digite o nome do cliente"
+              value={formData.nome}
+              onChange={(e) =>
+                setFormData({ ...formData, nome: e.target.value })
+              }
             />
             {errors.nome && (
               <p className="text-red-500 text-sm">{errors.nome}</p>
@@ -171,21 +185,47 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
               id="email"
               type="email"
               placeholder="Digite o email do cliente"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email}</p>
             )}
           </div>
 
-          {/* Datas lado a lado (responsivo) */}
           <div className="grid grid-cols-1 gap-4">
+            {/* Data locação */}
             <div className="space-y-1">
               <Label htmlFor="dataLoc">Data da Locação</Label>
-              <Input type="date" />
+              <Input 
+              id="dataLoc"
+              type="date" 
+              value={formData.dataLoc}
+              onChange={(e) =>
+                setFormData({ ...formData, dataLoc: e.target.value })
+                }
+              />
+              {errors.dataLoc && (
+                <p className="text-red-500 text-sm">{errors.dataLoc}</p>
+                )}
             </div>
+
+            {/* Data devolução */}
             <div className="space-y-1">
               <Label htmlFor="dataDevol">Data Prevista de Devolução</Label>
-              <Input type="date" />
+              <Input 
+              id="dataDevol"
+              type="date" 
+              value={formData.dataDevol}
+              onChange={(e) =>
+                setFormData({ ...formData, dataDevol: e.target.value })
+                }
+              />
+              {errors.dataDevol && (
+                <p className="text-red-500 text-sm">{errors.dataDevol}</p>
+                )}
             </div>
           </div>
         </div>
