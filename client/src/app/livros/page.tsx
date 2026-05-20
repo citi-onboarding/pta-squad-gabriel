@@ -53,7 +53,7 @@ const livrosMock = [
 export default function Livros() {
   const [filtros, setFiltros] = useState({
     busca: "",
-    categoria: "todas",
+    categoria: "Todas",
   });
 
   //logica do filtro
@@ -63,7 +63,7 @@ export default function Livros() {
       livro.autor.toLowerCase().includes(filtros.busca.toLowerCase());
 
     const categoriaMatch =
-      filtros.categoria === "todas" ||
+      filtros.categoria === "Todas" ||
       livro.categoria.toLowerCase() === filtros.categoria.toLowerCase();
 
     return buscaMatch && categoriaMatch;
