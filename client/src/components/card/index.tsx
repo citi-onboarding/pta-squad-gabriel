@@ -13,10 +13,12 @@ import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
 import infantilImg from "../../../../assets/categoriasCard/infantil.png";
 
 interface CardLivroProps {
+  id : string;
   titulo: string;
   autor: string;
   categoria: string;
   quantidade: number;
+  onDeletar: (id: string) => void;
 }
 
 const imagensCategorias: { [key: string]: any } = {
@@ -27,12 +29,7 @@ const imagensCategorias: { [key: string]: any } = {
   Infantil: infantilImg,
 };
 
-export default function Card({
-  titulo,
-  autor,
-  categoria,
-  quantidade,
-}: CardLivroProps) {
+export default function Card({ id, titulo, autor, categoria, quantidade, onDeletar }: CardLivroProps) {
   return (
     // div geral
     <div className="bg-green-100 border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
@@ -82,6 +79,7 @@ export default function Card({
           <Button
             size="sm"
             className="h-9 bg-red-500 text-white hover:bg-red-600"
+            onClick={() => onDeletar(id)} 
           >
             <Trash2 className="w-3 h-3" />
           </Button>
