@@ -35,7 +35,7 @@ export default function Card({
 }: CardLivroProps) {
   return (
     // div geral
-    <div className="bg-green-100 border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg">
+    <div className="bg-green-100 border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
       {/* área da imagem */}
       <div className="w-full h-56 overflow-hidden">
         <Image
@@ -68,7 +68,13 @@ export default function Card({
           {/* emprestar */}
           <Button
             size="sm"
-            className="h-9 bg-emerald-500 text-white hover:bg-emerald-600"
+            disabled={quantidade === 0}
+            className={`h-9 flex items-center gap-1 text-xs px-3 py-1.5 rounded-md
+    ${
+      quantidade === 0
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : "bg-emerald-500 text-white hover:bg-emerald-600"
+    }`}
           >
             <Bookmark className="w-3 h-3" /> Emprestar
           </Button>
