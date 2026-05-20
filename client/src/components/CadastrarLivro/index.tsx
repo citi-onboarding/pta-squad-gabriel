@@ -60,8 +60,7 @@ export default function CadastrarLivro() {
 
     // Se houver algum erro, não enviar o formulário
     if (Object.values(novosErros).some((erro) => erro)) return;
-
-    console.log("Formulário válido, enviando dados:", form);
+       console.log("Formulário válido, enviando dados:", form);
   }
 
   //Função para limpar o formulário
@@ -90,10 +89,20 @@ export default function CadastrarLivro() {
   const imagensCategorias: { [key: string]: any } = {
     Romance: romanceImg,
     Tecnologia: tecnologiaImg,
-    História: historiaImg,
-    Ciências: cienciasImg,
+    Historia: historiaImg,
+    Ciencias: cienciasImg,
     Infantil: infantilImg,
   };
+
+    const categorias = [
+    { label: "Romance", value: "Romance" },
+    { label: "Tecnologia", value: "Tecnologia" },
+    { label: "História", value: "Historia" },
+    { label: "Ciências", value: "Ciencias" },
+    { label: "Infantil", value: "Infantil" },
+  ];
+
+ 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
       {/* Div geral */}
@@ -243,35 +252,29 @@ export default function CadastrarLivro() {
             </Label>
             {/* Botões de categoria -- Logica para mudar a cor dos botões ao clicar -- coloquei tudo em uma lista ao inves de criar separadamente*/}
             <div className="flex gap-3 flex-wrap">
-              {[
-                "Romance",
-                "Tecnologia",
-                "História",
-                "Ciências",
-                "Infantil",
-              ].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setForm({ ...form, categoria: cat })}
-                  className={`border rounded-md p-2 text-sm transition-all flex flex-col items-center gap-2 w-36
-                    ${
-                      form.categoria === cat
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700 font-medium"
-                        : "border-gray-300 text-gray-600 hover:border-emerald-400"
-                    }`}
-                >
-                  {/* Foto */}
-                  <div className="w-28 h-28 rounded-md overflow-hidden">
-                    <Image
-                      src={imagensCategorias[cat]}
-                      alt={cat}
-                      width={112}
-                      height={112}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                </button>
-              ))}
+             {categorias.map(({ label, value }) => (
+            <button
+              key={value}
+              onClick={() => setForm({ ...form, categoria: value })}
+              className={`border rounded-md p-2 text-sm transition-all flex flex-col items-center gap-2 w-36
+                ${
+                  form.categoria === value
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 font-medium"
+                    : "border-gray-300 text-gray-600 hover:border-emerald-400"
+                }`}
+            >
+              <div className="w-28 h-28 rounded-md overflow-hidden">
+                <Image
+                  src={imagensCategorias[value]}
+                  alt={label}
+                  width={112}
+                  height={112}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <span>{label}</span>
+            </button>
+          ))}
             </div>
             <p
               className={`text-red-500 text-xs mt-1 ${

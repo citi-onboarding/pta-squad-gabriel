@@ -22,8 +22,8 @@ interface CardLivroProps {
 const imagensCategorias: { [key: string]: any } = {
   Romance: romanceImg,
   Tecnologia: tecnologiaImg,
-  História: historiaImg,
-  Ciências: cienciasImg,
+  Historia: historiaImg,
+  Ciencias: cienciasImg,
   Infantil: infantilImg,
 };
 
