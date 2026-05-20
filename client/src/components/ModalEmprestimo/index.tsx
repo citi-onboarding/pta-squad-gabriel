@@ -24,7 +24,7 @@ export type EmprestDataProps = {
 };
 
 type LivroMock = {
-  id: number;
+  id: string;
   titulo: string;
 };
 
@@ -53,7 +53,6 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
     let isValid = true;
 
     if (!formData.nome.trim()) {
-      console.log(formData)
       newErrors.nome = "Nome é obrigatório";
       isValid = false;
     }
@@ -76,11 +75,10 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
       newErrors.dataDevol = "Obrigatório";
       isValid = false;
     } else if (new Date(formData.dataDevol) < new Date(formData.dataLoc)) {
-      newErrors.dataDevol = "Deve ser depois da locação";
+      newErrors.dataDevol = "Data deve ser após a data de locação";
       isValid = false;
     }
 
-    console.log(newErrors)
     setErrors(newErrors);
     return isValid;
   };
@@ -89,23 +87,22 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
     if (!validateForm()) return;
 
     onConfirm({
-      livroId: livro.id.toString(),
+      livroId: livro.id,
       nome: formData.nome,
       email: formData.email,
       dataLoc: new Date(formData.dataLoc),
       dataDevol: new Date(formData.dataDevol),
     });
     setOpen(false);
-    setFormData({
-      nome: "",
-      email: "",
-      dataLoc: new Date().toISOString().split("T")[0],
-      dataDevol: "",
-    });
+    resetForms();
   };
 
   const handleCancel = () => {
     setOpen(false);
+    resetForms();
+  };
+
+  const resetForms = () => {
     setErrors({ nome: "", email: "", dataLoc: "", dataDevol: "" });
     setFormData({
       nome: "",
@@ -113,10 +110,15 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
       dataLoc: new Date().toISOString().split("T")[0],
       dataDevol: "",
     });
-  };
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={(novaSituacao) => {
+        if (!novaSituacao) {
+          resetForms();
+        }
+        setOpen(novaSituacao);
+      }}>
       <DialogTrigger asChild>
         <Button
           variant="default"
@@ -154,7 +156,7 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
 
         <div className="px-5 py-4 space-y-4">
           {/* Livro selecionado */}
-          <div className="rounded-lg border-gray-100 bg-gray-50 px-3 py-3">
+          <div className="rounded-lg border-gray-300 bg-gray-100 px-3 py-3">
             <Label className="text-gray-500 font-normal">
               Livro selecionado
             </Label>
@@ -173,9 +175,9 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
                 setFormData({ ...formData, nome: e.target.value })
               }
             />
-            {errors.nome && (
-              <p className="text-red-500 text-sm">{errors.nome}</p>
-            )}
+              <div className="h-1 text-sm text-red-500">
+                {errors.nome && <span>{errors.nome}</span>}
+              </div>
           </div>
 
           {/* Email */}
@@ -190,9 +192,9 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
                 setFormData({ ...formData, email: e.target.value })
               }
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email}</p>
-            )}
+            <div className="h-1 text-sm text-red-500">
+                {errors.email && <span>{errors.email}</span>}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4">
@@ -207,10 +209,10 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
                 setFormData({ ...formData, dataLoc: e.target.value })
                 }
               />
-              {errors.dataLoc && (
-                <p className="text-red-500 text-sm">{errors.dataLoc}</p>
-                )}
-            </div>
+              <div className="h-1 text-sm text-red-500">
+                {errors.dataLoc && <span>{errors.dataLoc}</span>}
+              </div>
+          </div>
 
             {/* Data devolução */}
             <div className="space-y-1">
@@ -223,9 +225,9 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
                 setFormData({ ...formData, dataDevol: e.target.value })
                 }
               />
-              {errors.dataDevol && (
-                <p className="text-red-500 text-sm">{errors.dataDevol}</p>
-                )}
+              <div className="h-1 text-sm text-red-500">
+                {errors.dataDevol && <span>{errors.dataDevol}</span>}
+              </div>
             </div>
           </div>
         </div>
