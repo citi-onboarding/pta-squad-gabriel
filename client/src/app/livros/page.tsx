@@ -4,7 +4,6 @@ import * as React from "react";
 import { useState } from "react";
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
-import { useEffect } from "react";
 
 const livrosMock = [
   {
@@ -32,14 +31,14 @@ const livrosMock = [
     id: 4,
     titulo: "Sapiens",
     autor: "Yuval Noah Harari",
-    categoria: "História",
+    categoria: "Historia",
     quantidade: 6,
   },
   {
     id: 5,
     titulo: "Cosmos",
     autor: "Carl Sagan",
-    categoria: "Ciências",
+    categoria: "Ciencias",
     quantidade: 4,
   },
   {
@@ -70,14 +69,7 @@ export default function Livros() {
     return buscaMatch && categoriaMatch;
   });
 
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simula uma chamada à API
-    setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-  }, []);
+const [loading, setLoading] = useState(false);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7F9FA" }}>
@@ -88,7 +80,7 @@ export default function Livros() {
         </p>
 
         {/* barra de busca */}
-        <div className="-mt-20">
+        <div className="-mt-4">
           <BarraDeBuscar filtros={filtros} onChange={setFiltros} />
         </div>
 
