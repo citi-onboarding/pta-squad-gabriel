@@ -60,8 +60,10 @@ export default function CadastrarLivro() {
 
     // Se houver algum erro, não enviar o formulário
     if (Object.values(novosErros).some((erro) => erro)) return;
-
-    console.log("Formulário válido, enviando dados:", form);
+      console.log("Formulário válido, enviando dados:", {
+        ...form,
+        categoria: categoriaValores[form.categoria] ?? form.categoria,
+    });
   }
 
   //Função para limpar o formulário
@@ -94,6 +96,15 @@ export default function CadastrarLivro() {
     Ciências: cienciasImg,
     Infantil: infantilImg,
   };
+
+    const categoriaValores: { [key: string]: string } = {
+    Romance: "Romance",
+    Tecnologia: "Tecnologia",
+    História: "Historia",
+    Ciências: "Ciencias",
+    Infantil: "Infantil",
+  };
+  
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
       {/* Div geral */}

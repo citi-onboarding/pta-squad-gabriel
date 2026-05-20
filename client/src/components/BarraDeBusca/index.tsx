@@ -52,27 +52,27 @@ export default function BarraDeBuscar({ filtros, onChange }: BarraDeBuscarProps)
 
           <SelectContent>
 
-            <SelectItem value="todas">
+            <SelectItem value="Todas">
               Todas
             </SelectItem>
 
-            <SelectItem value="romance">
+            <SelectItem value="Romance">
               Romance
             </SelectItem>
 
-            <SelectItem value="infantil">
+            <SelectItem value="Infantil">
               Infantil
             </SelectItem>
 
-            <SelectItem value="tecnologia">
+            <SelectItem value="Tecnologia">
               Tecnologia
             </SelectItem>
 
-            <SelectItem value="historia">
+            <SelectItem value="Historia">
               História
             </SelectItem>
 
-            <SelectItem value="ciencias">
+            <SelectItem value="Ciencias">
               Ciências
             </SelectItem>
 
