@@ -1,54 +1,120 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
+import {
+  EmprestDataProps,
+  LivroMock,
+  ModalDetalhesLivro,
+} from "@/components/ModalDetalhesLivro";
 
-const livrosMock = [
+const livrosMock: LivroMock[] = [
   {
-    id: 1,
+    id: "1",
     titulo: "Clean Code",
     autor: "Robert C. Martin",
-    categoria: "Tecnologia",
-    quantidade: 5,
+    isbn: "978-0132350884",
+    categoria: "TECNOLOGIA",
+    editora: "Prentice Hall",
+    ano: 2008,
+    quantidade_total: 5,
+    quantidade_disponivel: 3,
+    imagem_url: "",
   },
   {
-    id: 2,
+    id: "2",
     titulo: "O Pequeno Príncipe",
     autor: "Antoine de Saint-Exupéry",
-    categoria: "Infantil",
-    quantidade: 8,
+    isbn: "978-8595081512",
+    categoria: "INFANTIL",
+    editora: "Agir",
+    ano: 2015,
+    quantidade_total: 8,
+    quantidade_disponivel: 8,
+    imagem_url: "",
   },
   {
-    id: 3,
+    id: "3",
     titulo: "Dom Casmurro",
     autor: "Machado de Assis",
-    categoria: "Romance",
-    quantidade: 3,
+    isbn: "978-8520922389",
+    categoria: "ROMANCE",
+    editora: "Editora Garnier",
+    ano: 1899,
+    quantidade_total: 3,
+    quantidade_disponivel: 3,
+    imagem_url: "",
   },
   {
-    id: 4,
+    id: "4",
     titulo: "Sapiens",
     autor: "Yuval Noah Harari",
-    categoria: "Historia",
-    quantidade: 6,
+    isbn: "978-8535926990",
+    categoria: "HISTORIA",
+    editora: "Companhia das Letras",
+    ano: 2015,
+    quantidade_total: 6,
+    quantidade_disponivel: 6,
+    imagem_url: "",
   },
   {
-    id: 5,
+    id: "5",
     titulo: "Cosmos",
     autor: "Carl Sagan",
-    categoria: "Ciencias",
-    quantidade: 4,
+    isbn: "978-8576570437",
+    categoria: "CIENCIAS",
+    editora: "Companhia das Letras",
+    ano: 2017,
+    quantidade_total: 4,
+    quantidade_disponivel: 4,
+    imagem_url: "",
   },
   {
-    id: 6,
+    id: "6",
     titulo: "1984",
     autor: "George Orwell",
-    categoria: "Romance",
-    quantidade: 0,
+    isbn: "978-8535914849",
+    categoria: "ROMANCE",
+    editora: "Companhia das Letras",
+    ano: 2009,
+    quantidade_total: 0,
+    quantidade_disponivel: 0,
+    imagem_url: "",
   },
 ];
+
+const emprestimosPorLivro: Record<string, EmprestDataProps[]> = {
+  "1": [
+    {
+      emprestimoId: "emp1",
+      livroId: "1",
+      nome: "João Silva",
+      email: "joao@email.com",
+      dataLoc: new Date(2025, 3, 10),
+      dataDevol: new Date(2025, 4, 10),
+      status: "Em andamento",
+    },
+    {
+      emprestimoId: "emp2",
+      livroId: "1",
+      nome: "Maria Oliveira",
+      email: "maria@email.com",
+      dataLoc: new Date(2025, 2, 5),
+      dataDevol: new Date(2025, 2, 20),
+      status: "Atrasado",
+    },
+    {
+      emprestimoId: "emp3",
+      livroId: "1",
+      nome: "Carlos Mendes",
+      email: "carlos@email.com",
+      dataLoc: new Date(2025, 4, 1),
+      dataDevol: new Date(2025, 5, 1),
+      status: "Devolvido",
+    },
+  ],
+};
 
 export default function Livros() {
   const [filtros, setFiltros] = useState({
@@ -69,7 +135,20 @@ export default function Livros() {
     return buscaMatch && categoriaMatch;
   });
 
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedLivro, setSelectedLivro] = useState<LivroMock | null>(null);
+  const [selectedEmprestimos, setSelectedEmprestimos] = useState<
+    EmprestDataProps[]
+  >([]);
+
+  const handleVerClick = (livro: LivroMock) => {
+    setSelectedLivro(livro);
+    const emprestimos = emprestimosPorLivro[livro.id] || [];
+    setSelectedEmprestimos(emprestimos);
+    setModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7F9FA" }}>
@@ -92,13 +171,7 @@ const [loading, setLoading] = useState(false);
         ) : (
           <div className="mt-6 grid grid-cols-3 gap-4">
             {livrosFiltrados.map((livro) => (
-              <Card
-                key={livro.id}
-                titulo={livro.titulo}
-                autor={livro.autor}
-                categoria={livro.categoria}
-                quantidade={livro.quantidade}
-              />
+              <Card key={livro.id} livro={livro} onVerClick={handleVerClick} />
             ))}
 
             {/* mensagem caso n tenha nenhum livro daquele tipo */}
@@ -113,6 +186,21 @@ const [loading, setLoading] = useState(false);
               </div>
             )}
           </div>
+        )}
+
+        {selectedLivro && (
+          <ModalDetalhesLivro
+            open={modalOpen}
+            onOpenChange={(open) => {
+              setModalOpen(open);
+              if (!open) {
+                setSelectedLivro(null);
+                setSelectedEmprestimos([]);
+              }
+            }}
+            livro={selectedLivro}
+            emprestimos={selectedEmprestimos}
+          />
         )}
       </div>
     </div>

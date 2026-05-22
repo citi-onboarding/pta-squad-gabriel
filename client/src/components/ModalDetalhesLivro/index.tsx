@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -22,6 +22,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Eye, MailIcon, Loader2 } from "lucide-react";
+import romanceImg from "../../../../assets/categoriasCard/romance.png";
+import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
+import historiaImg from "../../../../assets/categoriasCard/historia.png";
+import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
+import infantilImg from "../../../../assets/categoriasCard/infantil.png";
 
 export type Categoria =
   | "INFANTIL"
@@ -53,6 +58,14 @@ export type EmprestDataProps = {
   status: string;
 };
 
+const imagensCategorias: Record<Categoria, any> = {
+  ROMANCE: romanceImg,
+  TECNOLOGIA: tecnologiaImg,
+  HISTORIA: historiaImg,
+  CIENCIAS: cienciasImg,
+  INFANTIL: infantilImg,
+};
+
 interface ModalDetalhesLivroProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -81,8 +94,12 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export function ModalDetalhesLivro({ open, onOpenChange, livro, emprestimos }: ModalDetalhesLivroProps) {
-  const [isOpen, setOpen] = useState(false);
+export function ModalDetalhesLivro({
+  open,
+  onOpenChange,
+  livro,
+  emprestimos,
+}: ModalDetalhesLivroProps) {
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
@@ -98,19 +115,7 @@ export function ModalDetalhesLivro({ open, onOpenChange, livro, emprestimos }: M
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="border-2 border-emerald-500 text-emerald-500 
-          w-full sm:w-auto sm:min-w-[100px] px-3
-          inline-flex items-center justify-center gap-2"
-        >
-          <Eye />
-          <span className="leading-none h-5">Ver</span>
-        </Button>
-      </DialogTrigger>
-
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="
           w-[calc(100%-2rem)]
@@ -137,15 +142,13 @@ export function ModalDetalhesLivro({ open, onOpenChange, livro, emprestimos }: M
 
         <div className="flex flex-col sm:flex-row gap-4 px-6 py-3">
           <div className="w-full sm:w-44 h-62 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-            {livro.imagem_url ? (
-              <img
-                src={livro.imagem_url}
-                alt={`Capa de ${livro.titulo}`}
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-100" />
-            )}
+            <Image
+              src={livro.imagem_url || imagensCategorias[livro.categoria]}
+              alt={`Capa de ${livro.titulo}`}
+              width={176}
+              height={248}
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <div className="flex-1 min-w-0 sm:pl-4">
