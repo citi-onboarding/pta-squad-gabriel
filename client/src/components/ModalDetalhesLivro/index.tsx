@@ -71,6 +71,7 @@ interface ModalDetalhesLivroProps {
   onOpenChange: (open: boolean) => void;
   livro: LivroMock;
   emprestimos: EmprestDataProps[];
+  onAtualizarStatus?: (livroId: string, emprestimoId: string, novoStatus: string) => void;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -83,7 +84,7 @@ function StatusBadge({ status }: { status: string }) {
   };
 
   const className =
-    styles[key] ?? "border border-gray-300 text-gray-600 bg-gray-50";
+    styles[key] || "border border-gray-300 text-gray-600 bg-gray-50";
 
   return (
     <span
@@ -99,6 +100,7 @@ export function ModalDetalhesLivro({
   onOpenChange,
   livro,
   emprestimos,
+  onAtualizarStatus,
 }: ModalDetalhesLivroProps) {
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -111,6 +113,7 @@ export function ModalDetalhesLivro({
     setConfirmandoId(null);
     setLoadingId(emprestimoId);
     await fetch(`/emprestimos/${emprestimoId}/devolver`, { method: "PATCH" });
+    onAtualizarStatus?.(livro.id, emprestimoId, 'Devolvido');
     setLoadingId(null);
   };
 

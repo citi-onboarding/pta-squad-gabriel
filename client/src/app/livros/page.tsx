@@ -142,11 +142,19 @@ export default function Livros() {
   const [selectedEmprestimos, setSelectedEmprestimos] = useState<
     EmprestDataProps[]
   >([]);
+  const [emprestimosMap, setEmprestimosMap] = useState<Record<string, EmprestDataProps[]>>(emprestimosPorLivro);
+
+  const atualizarStatusEmprestimo = (livroId: string, emprestimoId: string, novoStatus: string) => {
+    setEmprestimosMap(prev => {
+      const emprestimosDoLivro = prev[livroId]?.map(emp =>
+        emp.emprestimoId === emprestimoId ? { ...emp, status: novoStatus } : emp
+      );
+      return { ...prev, [livroId]: emprestimosDoLivro };
+    });
+  };
 
   const handleVerClick = (livro: LivroMock) => {
     setSelectedLivro(livro);
-    const emprestimos = emprestimosPorLivro[livro.id] || [];
-    setSelectedEmprestimos(emprestimos);
     setModalOpen(true);
   };
 
@@ -188,6 +196,7 @@ export default function Livros() {
           </div>
         )}
 
+        {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
         {selectedLivro && (
           <ModalDetalhesLivro
             open={modalOpen}
@@ -199,7 +208,8 @@ export default function Livros() {
               }
             }}
             livro={selectedLivro}
-            emprestimos={selectedEmprestimos}
+            emprestimos={emprestimosMap[selectedLivro.id]}
+            onAtualizarStatus={atualizarStatusEmprestimo}
           />
         )}
       </div>
