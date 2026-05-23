@@ -33,6 +33,7 @@ model Livro {
   ano                   Int
   quantidade_total      Int
   quantidade_disponivel Int
+  foto_url              String?
   categoria             Categoria
   emprestimos           Emprestimo[]
   createdAt             DateTime     @default(now())
