@@ -11,11 +11,11 @@ import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
 import historiaImg from "../../../../assets/categoriasCard/historia.png";
 import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
 import infantilImg from "../../../../assets/categoriasCard/infantil.png";
-import { LivroMock } from "../ModalDetalhesLivro";
+import { LivroDataProps } from "../../types/typeExample";
 
 interface CardLivroProps {
-  livro: LivroMock;
-  onVerClick: (livro: LivroMock) => void;
+  livro: LivroDataProps;
+  onVerClick: (livro: LivroDataProps) => void;
 }
 
 const imagensCategorias: { [key: string]: any } = {

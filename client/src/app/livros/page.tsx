@@ -3,118 +3,13 @@
 import { useState } from "react";
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
+import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
 import {
   EmprestDataProps,
-  LivroMock,
-  ModalDetalhesLivro,
-} from "@/components/ModalDetalhesLivro";
-
-const livrosMock: LivroMock[] = [
-  {
-    id: "1",
-    titulo: "Clean Code",
-    autor: "Robert C. Martin",
-    isbn: "978-0132350884",
-    categoria: "TECNOLOGIA",
-    editora: "Prentice Hall",
-    ano: 2008,
-    quantidade_total: 5,
-    quantidade_disponivel: 3,
-    imagem_url: "",
-  },
-  {
-    id: "2",
-    titulo: "O Pequeno Príncipe",
-    autor: "Antoine de Saint-Exupéry",
-    isbn: "978-8595081512",
-    categoria: "INFANTIL",
-    editora: "Agir",
-    ano: 2015,
-    quantidade_total: 8,
-    quantidade_disponivel: 8,
-    imagem_url: "",
-  },
-  {
-    id: "3",
-    titulo: "Dom Casmurro",
-    autor: "Machado de Assis",
-    isbn: "978-8520922389",
-    categoria: "ROMANCE",
-    editora: "Editora Garnier",
-    ano: 1899,
-    quantidade_total: 3,
-    quantidade_disponivel: 3,
-    imagem_url: "",
-  },
-  {
-    id: "4",
-    titulo: "Sapiens",
-    autor: "Yuval Noah Harari",
-    isbn: "978-8535926990",
-    categoria: "HISTORIA",
-    editora: "Companhia das Letras",
-    ano: 2015,
-    quantidade_total: 6,
-    quantidade_disponivel: 6,
-    imagem_url: "",
-  },
-  {
-    id: "5",
-    titulo: "Cosmos",
-    autor: "Carl Sagan",
-    isbn: "978-8576570437",
-    categoria: "CIENCIAS",
-    editora: "Companhia das Letras",
-    ano: 2017,
-    quantidade_total: 4,
-    quantidade_disponivel: 4,
-    imagem_url: "",
-  },
-  {
-    id: "6",
-    titulo: "1984",
-    autor: "George Orwell",
-    isbn: "978-8535914849",
-    categoria: "ROMANCE",
-    editora: "Companhia das Letras",
-    ano: 2009,
-    quantidade_total: 0,
-    quantidade_disponivel: 0,
-    imagem_url: "",
-  },
-];
-
-const emprestimosPorLivro: Record<string, EmprestDataProps[]> = {
-  "1": [
-    {
-      emprestimoId: "emp1",
-      livroId: "1",
-      nome: "João Silva",
-      email: "joao@email.com",
-      dataLoc: new Date(2025, 3, 10),
-      dataDevol: new Date(2025, 4, 10),
-      status: "Em andamento",
-    },
-    {
-      emprestimoId: "emp2",
-      livroId: "1",
-      nome: "Maria Oliveira",
-      email: "maria@email.com",
-      dataLoc: new Date(2025, 2, 5),
-      dataDevol: new Date(2025, 2, 20),
-      status: "Atrasado",
-    },
-    {
-      emprestimoId: "emp3",
-      livroId: "1",
-      nome: "Carlos Mendes",
-      email: "carlos@email.com",
-      dataLoc: new Date(2025, 4, 1),
-      dataDevol: new Date(2025, 5, 1),
-      status: "Devolvido",
-    },
-  ],
-};
+  LivroDataProps,
+} from "../../types/typeExample";
+import { emprestimosMock } from "@/mocks/emprestimo"
+import { livrosMock } from "@/mocks/livro";
 
 export default function Livros() {
   const [filtros, setFiltros] = useState({
@@ -138,11 +33,11 @@ export default function Livros() {
   const [loading, setLoading] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedLivro, setSelectedLivro] = useState<LivroMock | null>(null);
+  const [selectedLivro, setSelectedLivro] = useState<LivroDataProps | null>(null);
   const [selectedEmprestimos, setSelectedEmprestimos] = useState<
     EmprestDataProps[]
   >([]);
-  const [emprestimosMap, setEmprestimosMap] = useState<Record<string, EmprestDataProps[]>>(emprestimosPorLivro);
+  const [emprestimosMap, setEmprestimosMap] = useState<Record<string, EmprestDataProps[]>>(emprestimosMock);
 
   const atualizarStatusEmprestimo = (livroId: string, emprestimoId: string, novoStatus: string) => {
     setEmprestimosMap(prev => {
@@ -153,7 +48,7 @@ export default function Livros() {
     });
   };
 
-  const handleVerClick = (livro: LivroMock) => {
+  const handleVerClick = (livro: LivroDataProps) => {
     setSelectedLivro(livro);
     setModalOpen(true);
   };

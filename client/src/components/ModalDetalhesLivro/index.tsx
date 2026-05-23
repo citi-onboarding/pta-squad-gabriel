@@ -27,36 +27,7 @@ import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
 import historiaImg from "../../../../assets/categoriasCard/historia.png";
 import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
 import infantilImg from "../../../../assets/categoriasCard/infantil.png";
-
-export type Categoria =
-  | "INFANTIL"
-  | "ROMANCE"
-  | "HISTORIA"
-  | "CIENCIAS"
-  | "TECNOLOGIA";
-
-export type LivroMock = {
-  id: string;
-  titulo: string;
-  autor: string;
-  isbn: string;
-  categoria: Categoria;
-  editora: string;
-  ano: number;
-  quantidade_total: number;
-  quantidade_disponivel: number;
-  imagem_url?: string;
-};
-
-export type EmprestDataProps = {
-  emprestimoId: string;
-  livroId: string;
-  nome: string;
-  email: string;
-  dataLoc: Date;
-  dataDevol: Date;
-  status: string;
-};
+import { Categoria, LivroDataProps, EmprestDataProps } from "@/types/typeExample";
 
 const imagensCategorias: Record<Categoria, any> = {
   ROMANCE: romanceImg,
@@ -69,7 +40,7 @@ const imagensCategorias: Record<Categoria, any> = {
 interface ModalDetalhesLivroProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  livro: LivroMock;
+  livro: LivroDataProps;
   emprestimos: EmprestDataProps[];
   onAtualizarStatus?: (livroId: string, emprestimoId: string, novoStatus: string) => void;
 }
