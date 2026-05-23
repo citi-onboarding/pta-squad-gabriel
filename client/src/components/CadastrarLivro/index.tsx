@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,19 +15,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Categoria } from "@/types";
 
-const categoriaParaEnum = {
-  Romance: "ROMANCE",
-  Tecnologia: "TECNOLOGIA",
-  História: "HISTORIA",
-  Ciências: "CIENCIAS",
-  Infantil: "INFANTIL",
+const categoriaParaEnum: Record<Categoria, string> = {
+  Romance: "Romance",
+  Tecnologia: "Tecnologia",
+  Historia: "Historia",
+  Ciencias: "Ciencias",
+  Infantil: "Infantil",
 };
 
-const categorias = Object.keys(categoriaParaEnum).map((key) => ({
-  label: key,
-  value: key,
-}));
+const categorias: { label: string; value: Categoria }[] = [
+  { label: "Romance", value: "Romance" },
+  { label: "Tecnologia", value: "Tecnologia" },
+  { label: "História", value: "Historia" },
+  { label: "Ciências", value: "Ciencias" },
+  { label: "Infantil", value: "Infantil" },
+];
 
 interface CadastrarLivroProps {
   onCadastrar: (livro: any) => Promise<void>;
@@ -47,7 +50,7 @@ export default function CadastrarLivro({
     editora: "",
     ano: "",
     quantidade_total: "",
-    categoria: "",
+    categoria: "" as Categoria | "",
     foto_url: "",
   });
 
@@ -56,7 +59,7 @@ export default function CadastrarLivro({
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleCategoriaChange(value: string) {
+  function handleCategoriaChange(value: Categoria) {
     setForm((prev) => ({ ...prev, categoria: value }));
     if (erros.categoria) {
       setErros((prev) => ({ ...prev, categoria: false }));
@@ -85,9 +88,12 @@ export default function CadastrarLivro({
         form.ano === "" ||
         Number(form.ano) < 1000 ||
         Number(form.ano) > new Date().getFullYear(),
-      quantidade_total: form.quantidade_total === "",
+      quantidade_total:
+        form.quantidade_total === "" ||
+        Number(form.quantidade_total) < 1 ||
+        isNaN(Number(form.quantidade_total)),
       categoria: form.categoria === "",
-      foto_url: form.foto_url === "",
+      foto_url: false,
     };
 
     setErros(novosErros);
@@ -135,15 +141,15 @@ export default function CadastrarLivro({
       editora: form.editora.trim(),
       ano: Number(form.ano),
       quantidade_total: Number(form.quantidade_total),
-      categoria: categoriaParaEnum[form.categoria],
+      categoria: categoriaParaEnum[form.categoria as Categoria],
       foto_url: form.foto_url.trim(),
     };
 
     try {
-      onCadastrar(livro);
+      await onCadastrar(livro);
       resetForm();
     } catch (error: any) {
-      toast.error(error.message || "Erro ao cadastrar livro.")
+      toast.error(error.message || "Erro ao cadastrar livro.");
     } finally {
       setSubmitting(false);
     }
@@ -178,19 +184,10 @@ export default function CadastrarLivro({
     handleCancelar();
   }
 
-  //Relacionando as imagens a suas categorias
-  const categorias = [
-    { label: "Romance", value: "Romance" },
-    { label: "Tecnologia", value: "Tecnologia" },
-    { label: "História", value: "Historia" },
-    { label: "Ciências", value: "Ciencias" },
-    { label: "Infantil", value: "Infantil" },
-  ];
-
   return (
-    <div className="min-h-screen bg-slate-50 flex items-start justify-center p-6">
+    <div className="min-h-screen bg-slate-50 py-6 px-4 flex justify-center">
       {/* Div geral */}
-      <div>
+      <div className="w-full max-w-4xl">
         {/* Título da página */}
         <h1 className="text-2xl font-semibold text-gray-800 mb-2">
           Cadastrar Novo Livro
@@ -200,8 +197,8 @@ export default function CadastrarLivro({
         </p>
 
         {/* Campo do formulario */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-xl p-4 md:p-8 w-full max-w-4xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-xl p-4 md:p-8 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* Titulo */}
             <div>
               <Label className="text-sm font-medium text-gray-900">
