@@ -1,12 +1,11 @@
-// import { Router } from "express";
-// import produtoRoutes from "./ProdutoRoutes";
-// import usuarioRoutes from "./UsuarioRoutes";
-// import pedidoRoutes from "./PedidoRoutes";
 
-// const router = Router();
+import { Router } from "express";
+import LivroRoutes from "./LivroRoutes";
+import emprestimoRoutes from "./EmprestimoRoutes";
 
-// router.use("/produtos", produtoRoutes);
-// router.use("/usuarios", usuarioRoutes);
-// router.use("/pedidos", pedidoRoutes);
+const router = Router();
 
-// export default router;
+router.use("/livros", LivroRoutes);
+router.use("/emprestimos", emprestimoRoutes);
+
+export default router;
