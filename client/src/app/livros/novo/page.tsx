@@ -2,22 +2,19 @@
 import { useState } from "react";
 import CadastrarLivro from "@/components/CadastrarLivro";
 import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 export default function NovoLivro() {
   const router = useRouter()
 
   async function handleCadastrarLivro(livro: any) {
-    const response = await fetch("/api/livros", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(livro),
-    });
+    await api.post("/livros", livro)
 
-    router.push("/dashboard");
+    router.push("/livros");
   }
 
   async function handleCancelar() {
-    router.push("/dashboard");
+    router.push("/livros");
   }
   return (
     <CadastrarLivro
