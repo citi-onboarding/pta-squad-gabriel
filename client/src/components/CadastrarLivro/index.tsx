@@ -272,7 +272,6 @@ export default function CadastrarLivro() {
                   className="object-cover w-full h-full"
                 />
               </div>
-              <span>{label}</span>
             </button>
           ))}
             </div>
