@@ -83,7 +83,6 @@ export function ModalDetalhesLivro({
   const handleConfirmarDevolucao = async (emprestimoId: string) => {
     setConfirmandoId(null);
     setLoadingId(emprestimoId);
-    await fetch(`/emprestimos/${emprestimoId}/devolver`, { method: "PATCH" });
     onAtualizarStatus?.(livro.id, emprestimoId, 'Devolvido');
     setLoadingId(null);
   };
