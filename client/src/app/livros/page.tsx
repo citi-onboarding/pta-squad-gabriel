@@ -3,51 +3,11 @@
 import { useState } from "react";
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
-
-const livrosMock = [
-  {
-    id: 1,
-    titulo: "Clean Code",
-    autor: "Robert C. Martin",
-    categoria: "Tecnologia",
-    quantidade_disponivel: 5,
-  },
-  {
-    id: 2,
-    titulo: "O Pequeno Príncipe",
-    autor: "Antoine de Saint-Exupéry",
-    categoria: "Infantil",
-    quantidade_disponivel: 8,
-  },
-  {
-    id: 3,
-    titulo: "Dom Casmurro",
-    autor: "Machado de Assis",
-    categoria: "Romance",
-    quantidade_disponivel: 3,
-  },
-  {
-    id: 4,
-    titulo: "Sapiens",
-    autor: "Yuval Noah Harari",
-    categoria: "Historia",
-    quantidade_disponivel: 6,
-  },
-  {
-    id: 5,
-    titulo: "Cosmos",
-    autor: "Carl Sagan",
-    categoria: "Ciencias",
-    quantidade_disponivel: 4,
-  },
-  {
-    id: 6,
-    titulo: "1984",
-    autor: "George Orwell",
-    categoria: "Romance",
-    quantidade_disponivel: 0,
-  },
-];
+import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
+import { Emprestimo, LivroResumido, Livro } from "@/types/index";
+import { emprestimosMock } from "@/mocks/emprestimo";
+import { StatusEmprestimo } from "@/types/index";
+import { livrosMock } from "@/mocks/livro";
 
 export default function Livros() {
   const [filtros, setFiltros] = useState({
@@ -80,6 +40,35 @@ export default function Livros() {
 
   const [loading, setLoading] = useState(false);
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedLivro, setSelectedLivro] = useState<Livro | null>(null);
+  const [selectedEmprestimos, setSelectedEmprestimos] = useState<Emprestimo[]>(
+    [],
+  );
+  const [emprestimosMap, setEmprestimosMap] =
+    useState<Record<string, Emprestimo[]>>(emprestimosMock);
+
+  const atualizarStatusEmprestimo = (
+    livroId: string,
+    emprestimoId: string,
+    novoStatus: StatusEmprestimo,
+  ) => {
+    setEmprestimosMap((prev) => {
+      const emprestimosDoLivro = prev[livroId]?.map((emp) =>
+        emp.id === emprestimoId ? { ...emp, status: novoStatus } : emp,
+      );
+      return { ...prev, [livroId]: emprestimosDoLivro };
+    });
+  };
+
+  const handleVerClick = (livroResumido: LivroResumido) => {
+    const livroCompleto = livrosMock.find((l) => l.id === livroResumido.id);
+    if (livroCompleto) {
+      setSelectedLivro(livroCompleto);
+      setModalOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7F9FA" }}>
       <div className="max-w-6xl mx-auto px-4 py-6">
@@ -101,13 +90,7 @@ export default function Livros() {
         ) : (
           <div className="mt-6 grid grid-cols-3 gap-4">
             {livrosFiltrados.map((livro) => (
-              <Card
-                key={livro.id}
-                titulo={livro.titulo}
-                autor={livro.autor}
-                categoria={livro.categoria}
-                quantidade={livro.quantidade_disponivel}
-              />
+              <Card key={livro.id} livro={livro} onVerClick={handleVerClick} />
             ))}
 
             {/* mensagem caso n tenha nenhum livro daquele tipo */}
@@ -122,6 +105,23 @@ export default function Livros() {
               </div>
             )}
           </div>
+        )}
+
+        {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
+        {selectedLivro && (
+          <ModalDetalhesLivro
+            open={modalOpen}
+            onOpenChange={(open) => {
+              setModalOpen(open);
+              if (!open) {
+                setSelectedLivro(null);
+                setSelectedEmprestimos([]);
+              }
+            }}
+            livro={selectedLivro}
+            emprestimos={emprestimosMap[selectedLivro.id]}
+            onAtualizarStatus={atualizarStatusEmprestimo}
+          />
         )}
       </div>
     </div>
