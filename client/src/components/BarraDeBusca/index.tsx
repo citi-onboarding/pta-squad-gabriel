@@ -15,8 +15,9 @@ type BarraDeBuscarProps = {
   filtros: {
     busca: string
     categoria: string
+    disponibilidade: string
   }
-  onChange: (filtros: { busca: string; categoria: string }) => void
+  onChange: (filtros: { busca: string; categoria: string, disponibilidade: string }) => void
 }
 
 
@@ -41,13 +42,13 @@ export default function BarraDeBuscar({ filtros, onChange }: BarraDeBuscarProps)
         />
 
       </div>
-
+        <div className="flex gap-2">
         <Select 
         value={filtros.categoria}    
         onValueChange={(value) => onChange({ ...filtros, categoria: value })}
         >
-          <SelectTrigger className="w-[220px] rounded-xl">
-            <SelectValue />
+          <SelectTrigger className="w-[160px] rounded-xl">
+            <SelectValue placeholder="Categoria" />
           </SelectTrigger>
 
           <SelectContent>
@@ -78,6 +79,21 @@ export default function BarraDeBuscar({ filtros, onChange }: BarraDeBuscarProps)
 
           </SelectContent>
         </Select>
+
+        <Select
+          value={filtros.disponibilidade}
+          onValueChange={(value) => onChange({ ...filtros, disponibilidade: value })}
+        >
+          <SelectTrigger className="w-[160px] rounded-xl">
+            <SelectValue placeholder="Disponibilidade" />
+          </SelectTrigger  >
+          <SelectContent>
+            <SelectItem value="Todas">Todas</SelectItem>
+            <SelectItem value="Disponíveis">Disponíveis</SelectItem>
+            <SelectItem value="Indisponíveis">Indisponíveis</SelectItem>
+          </SelectContent>
+        </Select>
+        </div>
     </div>
   );
 }

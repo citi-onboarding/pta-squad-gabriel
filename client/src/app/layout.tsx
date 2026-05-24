@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <Header />
-        {children}
+        <main className="pt-16">{children}</main>
         <Toaster></Toaster>
       </body>
     </html>
