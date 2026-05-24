@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
@@ -11,42 +10,42 @@ const livrosMock = [
     titulo: "Clean Code",
     autor: "Robert C. Martin",
     categoria: "Tecnologia",
-    quantidade: 5,
+    quantidade_disponivel: 5,
   },
   {
     id: 2,
     titulo: "O Pequeno Príncipe",
     autor: "Antoine de Saint-Exupéry",
     categoria: "Infantil",
-    quantidade: 8,
+    quantidade_disponivel: 8,
   },
   {
     id: 3,
     titulo: "Dom Casmurro",
     autor: "Machado de Assis",
     categoria: "Romance",
-    quantidade: 3,
+    quantidade_disponivel: 3,
   },
   {
     id: 4,
     titulo: "Sapiens",
     autor: "Yuval Noah Harari",
     categoria: "Historia",
-    quantidade: 6,
+    quantidade_disponivel: 6,
   },
   {
     id: 5,
     titulo: "Cosmos",
     autor: "Carl Sagan",
     categoria: "Ciencias",
-    quantidade: 4,
+    quantidade_disponivel: 4,
   },
   {
     id: 6,
     titulo: "1984",
     autor: "George Orwell",
     categoria: "Romance",
-    quantidade: 0,
+    quantidade_disponivel: 0,
   },
 ];
 
@@ -71,13 +70,15 @@ export default function Livros() {
     const disponibilidadeMatch =
       filtros.disponibilidade === "" ||
       filtros.disponibilidade === "Todas" ||
-      (filtros.disponibilidade === "Disponíveis" && livro.quantidade > 0) ||
-      (filtros.disponibilidade === "Indisponíveis" && livro.quantidade === 0);
+      (filtros.disponibilidade === "Disponíveis" &&
+        livro.quantidade_disponivel > 0) ||
+      (filtros.disponibilidade === "Indisponíveis" &&
+        livro.quantidade_disponivel === 0);
 
     return buscaMatch && categoriaMatch && disponibilidadeMatch;
   });
 
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7F9FA" }}>
@@ -105,7 +106,7 @@ const [loading, setLoading] = useState(false);
                 titulo={livro.titulo}
                 autor={livro.autor}
                 categoria={livro.categoria}
-                quantidade={livro.quantidade}
+                quantidade={livro.quantidade_disponivel}
               />
             ))}
 
