@@ -1,25 +1,24 @@
 "use client";
-import { useState } from "react";
 import CadastrarLivro from "@/components/CadastrarLivro";
+import { CriarLivroDTO } from "@/types";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 export default function NovoLivro() {
-  const router = useRouter()
+  const router = useRouter();
 
-  async function handleCadastrarLivro(livro: any) {
+  async function handleCadastrarLivro(livro: CriarLivroDTO) {
     try {
-      await api.post("/livros", livro)
-      toast.success('Cadastrado com sucesso')
+      await api.post("/livros", livro);
+      toast.success("Cadastrado com sucesso");
+      router.push("/livros");
     } catch (error: any) {
-      toast.error(error.message || "Tente novamente.");    
-}
-
-    router.push("/livros");
+      toast.error(error.message || "Tente novamente.");
+    }
   }
 
-  async function handleCancelar() {
+  function handleCancelar() {
     router.push("/livros");
   }
   return (

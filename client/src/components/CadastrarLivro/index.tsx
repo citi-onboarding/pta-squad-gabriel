@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast, Toaster } from "sonner";
+import { CriarLivroDTO, Categoria } from "@/types";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +16,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Categoria } from "@/types";
 
 const categoriaParaEnum: Record<Categoria, string> = {
   Romance: "Romance",
@@ -34,7 +34,7 @@ const categorias: { label: string; value: Categoria }[] = [
 ];
 
 interface CadastrarLivroProps {
-  onCadastrar: (livro: any) => Promise<void>;
+  onCadastrar: (livro: CriarLivroDTO) => Promise<void>;
   onCancelar: () => void;
 }
 

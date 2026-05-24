@@ -18,6 +18,17 @@ export interface LivroResumido {
   foto_url?: string;
 }
 
+export interface CriarLivroDTO {
+  titulo: string;
+  autor: string;
+  isbn: string;
+  editora: string;
+  ano: number;
+  quantidade_total: number;
+  categoria: string;
+  foto_url?: string;
+}
+
 // Tipo completo usado no Modal de Detalhes
 export interface Livro extends LivroResumido {
   isbn: string;
