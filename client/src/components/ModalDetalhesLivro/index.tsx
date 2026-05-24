@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Eye, MailIcon, Loader2 } from "lucide-react";
+import { MailIcon, Loader2 } from "lucide-react";
 import romanceImg from "../../../../assets/categoriasCard/romance.png";
 import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
 import historiaImg from "../../../../assets/categoriasCard/historia.png";
@@ -42,7 +42,11 @@ interface ModalDetalhesLivroProps {
   onOpenChange: (open: boolean) => void;
   livro: Livro;
   emprestimos: Emprestimo[];
-  onAtualizarStatus?: (livroId: string, emprestimoId: string, novoStatus: StatusEmprestimo) => void;
+  onAtualizarStatus?: (
+    livroId: string,
+    emprestimoId: string,
+    novoStatus: StatusEmprestimo,
+  ) => void;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -54,6 +58,12 @@ function StatusBadge({ status }: { status: string }) {
     devolvido: "border border-emerald-400 text-emerald-700 bg-emerald-100",
   };
 
+  const labels: Record<string, string> = {
+    em_andamento: "Em andamento",
+    atrasado: "Atrasado",
+    devolvido: "Devolvido",
+  };
+
   const className =
     styles[key] || "border border-gray-300 text-gray-600 bg-gray-50";
 
@@ -61,7 +71,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap leading-none inline-flex items-center ${className}`}
     >
-      {status}
+      {labels[key] || status}
     </span>
   );
 }
@@ -77,13 +87,19 @@ export function ModalDetalhesLivro({
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handleEnviarLembrete = (emprestimo: Emprestimo) => {
-    alert(`Lembrete enviado para ${emprestimo.nome_cliente} (${emprestimo.email_cliente})`);
+    alert(
+      `Lembrete enviado para ${emprestimo.nome_cliente} (${emprestimo.email_cliente})`,
+    );
   };
 
   const handleConfirmarDevolucao = async (emprestimoId: string) => {
     setConfirmandoId(null);
     setLoadingId(emprestimoId);
-    onAtualizarStatus?.(livro.id, emprestimoId, 'Devolvido');
+    onAtualizarStatus?.(
+      livro.id,
+      emprestimoId,
+      "Devolvido" as StatusEmprestimo,
+    );
     setLoadingId(null);
   };
 
@@ -114,7 +130,7 @@ export function ModalDetalhesLivro({
         <div className="border-t border-gray-200" />
 
         <div className="flex flex-col sm:flex-row gap-4 px-6 py-3">
-          <div className="w-full sm:w-44 h-62 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+          <div className="w-full sm:w-44 h-60 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
             <Image
               src={livro.foto_url || imagensCategorias[livro.categoria]}
               alt={`Capa de ${livro.titulo}`}
@@ -208,9 +224,7 @@ export function ModalDetalhesLivro({
                         <Button
                           className="bg-emerald-500 hover:bg-emerald-600 text-white w-full min-[460px]:w-auto inline-flex items-center justify-center gap-2 px-5 h-12"
                           disabled={loadingId === emprestimo.id}
-                          onClick={() =>
-                            setConfirmandoId(emprestimo.id)
-                          }
+                          onClick={() => setConfirmandoId(emprestimo.id)}
                         >
                           {loadingId === emprestimo.id ? (
                             <Loader2 className="w-4 h-4 animate-spin" />

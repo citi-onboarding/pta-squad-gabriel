@@ -12,7 +12,8 @@ import { livrosMock } from "@/mocks/livro";
 export default function Livros() {
   const [filtros, setFiltros] = useState({
     busca: "",
-    categoria: "Todas",
+    categoria: "",
+    disponibilidade: "",
   });
 
   //logica do filtro
@@ -22,10 +23,19 @@ export default function Livros() {
       livro.autor.toLowerCase().includes(filtros.busca.toLowerCase());
 
     const categoriaMatch =
+      filtros.categoria === "" ||
       filtros.categoria === "Todas" ||
       livro.categoria.toLowerCase() === filtros.categoria.toLowerCase();
 
-    return buscaMatch && categoriaMatch;
+    const disponibilidadeMatch =
+      filtros.disponibilidade === "" ||
+      filtros.disponibilidade === "Todas" ||
+      (filtros.disponibilidade === "Disponíveis" &&
+        livro.quantidade_disponivel > 0) ||
+      (filtros.disponibilidade === "Indisponíveis" &&
+        livro.quantidade_disponivel === 0);
+
+    return buscaMatch && categoriaMatch && disponibilidadeMatch;
   });
 
   const [loading, setLoading] = useState(false);

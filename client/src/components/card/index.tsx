@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { Eye, Bookmark, Trash2 } from "lucide-react";
 // botao shadcn
 import { Button } from "@/components/ui/button";
@@ -28,15 +27,9 @@ const imagensCategorias: Record<Categoria, any> = {
 };
 
 export default function Card({ livro, onVerClick }: CardLivroProps) {
-  const {
-    titulo,
-    autor,
-    categoria,
-    quantidade_total,
-    quantidade_disponivel,
-  } = livro;
-  const imagemCategoria =
-    imagensCategorias[categoria] ?? romanceImg;
+  const { titulo, autor, categoria, quantidade_total, quantidade_disponivel } =
+    livro;
+  const imagemCategoria = imagensCategorias[categoria] ?? romanceImg;
 
   return (
     // div geral

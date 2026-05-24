@@ -11,7 +11,7 @@ export const livrosMock: Livro[] = [
     ano: 2008,
     quantidade_total: 5,
     quantidade_disponivel: 3,
-    foto_url: "",
+    foto_url: undefined,
   },
   {
     id: "2",
@@ -23,7 +23,7 @@ export const livrosMock: Livro[] = [
     ano: 2015,
     quantidade_total: 8,
     quantidade_disponivel: 8,
-    foto_url: "",
+    foto_url: undefined,
   },
   {
     id: "3",
@@ -35,7 +35,7 @@ export const livrosMock: Livro[] = [
     ano: 1899,
     quantidade_total: 3,
     quantidade_disponivel: 3,
-    foto_url: "",
+    foto_url: undefined,
   },
   {
     id: "4",
@@ -47,7 +47,7 @@ export const livrosMock: Livro[] = [
     ano: 2015,
     quantidade_total: 6,
     quantidade_disponivel: 6,
-    foto_url: "",
+    foto_url: undefined,
   },
   {
     id: "5",
@@ -59,7 +59,7 @@ export const livrosMock: Livro[] = [
     ano: 2017,
     quantidade_total: 4,
     quantidade_disponivel: 4,
-    foto_url: "",
+    foto_url: undefined,
   },
   {
     id: "6",
@@ -71,6 +71,6 @@ export const livrosMock: Livro[] = [
     ano: 2009,
     quantidade_total: 0,
     quantidade_disponivel: 0,
-    foto_url: "",
+    foto_url: undefined,
   },
 ];
