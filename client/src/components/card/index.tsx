@@ -11,34 +11,32 @@ import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
 import historiaImg from "../../../../assets/categoriasCard/historia.png";
 import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
 import infantilImg from "../../../../assets/categoriasCard/infantil.png";
-import { LivroDataProps } from "../../types/typeExample";
+import { LivroResumido } from "@/types";
+import { Categoria } from "@/types";
 
 interface CardLivroProps {
-  livro: LivroDataProps;
-  onVerClick: (livro: LivroDataProps) => void;
+  livro: LivroResumido;
+  onVerClick: (livro: LivroResumido) => void;
 }
 
-const imagensCategorias: { [key: string]: any } = {
-  ROMANCE: romanceImg,
-  TECNOLOGIA: tecnologiaImg,
-  HISTORIA: historiaImg,
-  CIENCIAS: cienciasImg,
-  INFANTIL: infantilImg,
+const imagensCategorias: Record<Categoria, any> = {
+  Romance: romanceImg,
+  Tecnologia: tecnologiaImg,
+  Historia: historiaImg,
+  Ciencias: cienciasImg,
+  Infantil: infantilImg,
 };
 
 export default function Card({ livro, onVerClick }: CardLivroProps) {
   const {
     titulo,
     autor,
-    isbn,
     categoria,
-    editora,
-    ano,
     quantidade_total,
     quantidade_disponivel,
   } = livro;
   const imagemCategoria =
-    imagensCategorias[categoria.toUpperCase()] ?? romanceImg;
+    imagensCategorias[categoria] ?? romanceImg;
 
   return (
     // div geral

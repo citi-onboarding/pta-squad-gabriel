@@ -4,11 +4,9 @@ import { useState } from "react";
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
 import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
-import {
-  EmprestDataProps,
-  LivroDataProps,
-} from "../../types/typeExample";
-import { emprestimosMock } from "@/mocks/emprestimo"
+import { Emprestimo, LivroResumido, Livro } from "@/types/index";
+import { emprestimosMock } from "@/mocks/emprestimo";
+import { StatusEmprestimo } from "@/types/index";
 import { livrosMock } from "@/mocks/livro";
 
 export default function Livros() {
@@ -33,24 +31,32 @@ export default function Livros() {
   const [loading, setLoading] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedLivro, setSelectedLivro] = useState<LivroDataProps | null>(null);
-  const [selectedEmprestimos, setSelectedEmprestimos] = useState<
-    EmprestDataProps[]
-  >([]);
-  const [emprestimosMap, setEmprestimosMap] = useState<Record<string, EmprestDataProps[]>>(emprestimosMock);
+  const [selectedLivro, setSelectedLivro] = useState<Livro | null>(null);
+  const [selectedEmprestimos, setSelectedEmprestimos] = useState<Emprestimo[]>(
+    [],
+  );
+  const [emprestimosMap, setEmprestimosMap] =
+    useState<Record<string, Emprestimo[]>>(emprestimosMock);
 
-  const atualizarStatusEmprestimo = (livroId: string, emprestimoId: string, novoStatus: string) => {
-    setEmprestimosMap(prev => {
-      const emprestimosDoLivro = prev[livroId]?.map(emp =>
-        emp.emprestimoId === emprestimoId ? { ...emp, status: novoStatus } : emp
+  const atualizarStatusEmprestimo = (
+    livroId: string,
+    emprestimoId: string,
+    novoStatus: StatusEmprestimo,
+  ) => {
+    setEmprestimosMap((prev) => {
+      const emprestimosDoLivro = prev[livroId]?.map((emp) =>
+        emp.id === emprestimoId ? { ...emp, status: novoStatus } : emp,
       );
       return { ...prev, [livroId]: emprestimosDoLivro };
     });
   };
 
-  const handleVerClick = (livro: LivroDataProps) => {
-    setSelectedLivro(livro);
-    setModalOpen(true);
+  const handleVerClick = (livroResumido: LivroResumido) => {
+    const livroCompleto = livrosMock.find((l) => l.id === livroResumido.id);
+    if (livroCompleto) {
+      setSelectedLivro(livroCompleto);
+      setModalOpen(true);
+    }
   };
 
   return (

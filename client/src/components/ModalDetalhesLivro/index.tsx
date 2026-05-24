@@ -27,29 +27,29 @@ import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
 import historiaImg from "../../../../assets/categoriasCard/historia.png";
 import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
 import infantilImg from "../../../../assets/categoriasCard/infantil.png";
-import { Categoria, LivroDataProps, EmprestDataProps } from "@/types/typeExample";
+import { Categoria, Livro, Emprestimo, StatusEmprestimo } from "@/types/index";
 
 const imagensCategorias: Record<Categoria, any> = {
-  ROMANCE: romanceImg,
-  TECNOLOGIA: tecnologiaImg,
-  HISTORIA: historiaImg,
-  CIENCIAS: cienciasImg,
-  INFANTIL: infantilImg,
+  Romance: romanceImg,
+  Tecnologia: tecnologiaImg,
+  Historia: historiaImg,
+  Ciencias: cienciasImg,
+  Infantil: infantilImg,
 };
 
 interface ModalDetalhesLivroProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  livro: LivroDataProps;
-  emprestimos: EmprestDataProps[];
-  onAtualizarStatus?: (livroId: string, emprestimoId: string, novoStatus: string) => void;
+  livro: Livro;
+  emprestimos: Emprestimo[];
+  onAtualizarStatus?: (livroId: string, emprestimoId: string, novoStatus: StatusEmprestimo) => void;
 }
 
 function StatusBadge({ status }: { status: string }) {
   const key = status.toLowerCase();
 
   const styles: Record<string, string> = {
-    "em andamento": "border border-yellow-400 text-yellow-700 bg-yellow-100",
+    em_andamento: "border border-yellow-400 text-yellow-700 bg-yellow-100",
     atrasado: "border border-red-400 text-red-700 bg-red-100",
     devolvido: "border border-emerald-400 text-emerald-700 bg-emerald-100",
   };
@@ -76,8 +76,8 @@ export function ModalDetalhesLivro({
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const handleEnviarLembrete = (emprestimo: EmprestDataProps) => {
-    alert(`Lembrete enviado para ${emprestimo.nome} (${emprestimo.email})`);
+  const handleEnviarLembrete = (emprestimo: Emprestimo) => {
+    alert(`Lembrete enviado para ${emprestimo.nome_cliente} (${emprestimo.email_cliente})`);
   };
 
   const handleConfirmarDevolucao = async (emprestimoId: string) => {
@@ -117,7 +117,7 @@ export function ModalDetalhesLivro({
         <div className="flex flex-col sm:flex-row gap-4 px-6 py-3">
           <div className="w-full sm:w-44 h-62 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
             <Image
-              src={livro.imagem_url || imagensCategorias[livro.categoria]}
+              src={livro.foto_url || imagensCategorias[livro.categoria]}
               alt={`Capa de ${livro.titulo}`}
               width={176}
               height={248}
@@ -193,27 +193,27 @@ export function ModalDetalhesLivro({
             <div className="flex flex-col gap-3">
               {emprestimos.map((emprestimo) => (
                 <div
-                  key={emprestimo.emprestimoId}
+                  key={emprestimo.id}
                   className="border border-gray-200 rounded-lg px-4 py-3"
                 >
                   <div className="flex flex-col min-[460px]:flex-row items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0 w-full min-[460px]:w-auto">
                       <span className="text-base font-semibold text-gray-800 truncate">
-                        {emprestimo.nome}
+                        {emprestimo.nome_cliente}
                       </span>
                       <StatusBadge status={emprestimo.status} />
                     </div>
 
                     <div className="flex gap-2 w-full min-[460px]:w-auto">
-                      {emprestimo.status.toLowerCase() === "em andamento" && (
+                      {emprestimo.status.toLowerCase() === "em_andamento" && (
                         <Button
                           className="bg-emerald-500 hover:bg-emerald-600 text-white w-full min-[460px]:w-auto inline-flex items-center justify-center gap-2 px-5 h-12"
-                          disabled={loadingId === emprestimo.emprestimoId}
+                          disabled={loadingId === emprestimo.id}
                           onClick={() =>
-                            setConfirmandoId(emprestimo.emprestimoId)
+                            setConfirmandoId(emprestimo.id)
                           }
                         >
-                          {loadingId === emprestimo.emprestimoId ? (
+                          {loadingId === emprestimo.id ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <span className="text-sm font-semibold leading-none">
@@ -239,20 +239,20 @@ export function ModalDetalhesLivro({
                   </div>
 
                   <p className="text-sm text-gray-400 mt-1">
-                    {emprestimo.email}
+                    {emprestimo.email_cliente}
                   </p>
 
                   <div className="flex gap-4 mt-2 text-base text-gray-500">
                     <span>
                       Locação:{" "}
                       <span className="text-gray-900">
-                        {emprestimo.dataLoc.toLocaleDateString("pt-BR")}
+                        {emprestimo.data_locacao}
                       </span>
                     </span>
                     <span>
                       Previsão:{" "}
                       <span className="text-gray-900">
-                        {emprestimo.dataDevol.toLocaleDateString("pt-BR")}
+                        {emprestimo.data_prevista_devolucao}
                       </span>
                     </span>
                   </div>
