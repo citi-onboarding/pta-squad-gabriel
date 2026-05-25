@@ -11,6 +11,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const nomesCategorias: Record<string, string> = {
+  Romance: "Romance",
+  Infantil: "Infantil",
+  Tecnologia: "Tecnologia",
+  Historia: "História",  
+  Ciencias: "Ciências",    
+};
+
 //cor definida pelo cliente p cada categoria
 const coresCategorias: { [key: string]: string } = {
   Romance: "#ef4444",    // vermelho
@@ -40,13 +48,14 @@ export default function GraficoLivros({ dados }: GraficoLivrosProps) {
 
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
-        <XAxis dataKey="categoria" />
+        <XAxis dataKey="categoria" 
+        tickFormatter={(value) => nomesCategorias[value] || value} />
 
         <YAxis />
 
         <Tooltip
           formatter={(value) => [value, "Quantidade"]}
-          labelFormatter={(label) => `Categoria: ${label}`}
+          labelFormatter={(label) => `Categoria: ${nomesCategorias[label] || label}`}
         />
 
         <Bar dataKey="quantidade" radius={[6, 6, 0, 0]}>
