@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Header from "@/components/header";
 import "styles/globals.css";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Biblioteca Escolar",
@@ -17,7 +18,8 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <Header />
-        {children}
+        <main className="pt-16">{children}</main>
+        <Toaster></Toaster>
       </body>
     </html>
   );

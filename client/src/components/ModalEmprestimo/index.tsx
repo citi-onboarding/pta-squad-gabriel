@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Bookmark } from "lucide-react";
 
-export type EmprestDataProps = {
+type EmprestDataProps = {
   livroId: string;
   nome: string;
   email: string;

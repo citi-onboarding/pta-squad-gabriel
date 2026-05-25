@@ -2,6 +2,8 @@
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
 import { livrosMock } from "@/mocks/livro";
 import { emprestimosMock } from "@/mocks/emprestimo";
+import GraficoLivros from "@/components/GraficoLivros";
+import { livrosPorCategoriaMock } from "@/mocks/LivroPorCategoria";
 
 export default function DashboardPage() {
   return (
@@ -12,6 +14,13 @@ export default function DashboardPage() {
         <p className="text-gray-500 text-sm mt-1">Visão geral da biblioteca</p>
 
         <TabelaEmprestimos livro={livrosMock} emprestimos={emprestimosMock}></TabelaEmprestimos>
+        <div className="mt-8 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-base font-semibold text-gray-800 mb-4">
+            Livros por Categoria
+          </h2>
+          {/* passa os dados mockados para o componente */}
+          <GraficoLivros dados={livrosPorCategoriaMock} />
+        </div>
       </main>
     </div>
   );
