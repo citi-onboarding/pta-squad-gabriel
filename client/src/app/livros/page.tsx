@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
 // componentes
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
 import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
 
 // tipos
-import { Emprestimo, LivroResumido, Livro } from "@/types/index";
-import { StatusEmprestimo } from "@/types/index";
+import { LivroResumido, Livro } from "@/types/index";
 
 // serviços
 import { getLivros, getLivroPorId } from "@/services/livrosService";
@@ -60,23 +60,6 @@ export default function Livros() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLivro, setSelectedLivro] = useState<Livro | null>(null);
-  const [emprestimosMap, setEmprestimosMap] = useState<
-    Record<string, Emprestimo[]>
-  >({});
-
-  // atualiza o status de um empréstimo
-  const atualizarStatusEmprestimo = (
-    livroId: string,
-    emprestimoId: string,
-    novoStatus: StatusEmprestimo,
-  ) => {
-    setEmprestimosMap((prev) => {
-      const emprestimosDoLivro = prev[livroId]?.map((emp) =>
-        emp.id === emprestimoId ? { ...emp, status: novoStatus } : emp,
-      );
-      return { ...prev, [livroId]: emprestimosDoLivro };
-    });
-  };
 
   // busca o livro completo da API e abre o modal de detalhes
   const handleVerClick = async (livroResumido: LivroResumido) => {
@@ -143,8 +126,7 @@ export default function Livros() {
               }
             }}
             livro={selectedLivro}
-            emprestimos={emprestimosMap[selectedLivro.id] ?? []}
-            onAtualizarStatus={atualizarStatusEmprestimo}
+            emprestimos={selectedLivro.emprestimos ?? []}
           />
         )}
       </div>

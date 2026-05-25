@@ -21,6 +21,8 @@ import infantilImg from "../../../../assets/categoriasCard/infantil.png";
 
 // tipagem
 import { LivroResumido, Categoria } from "@/types";
+// serviços
+import { deletarLivro } from "@/services/livrosService";
 
 // interface para as props do card
 interface CardLivroProps {
@@ -47,25 +49,11 @@ export default function Card({ livro, onVerClick, onDeletar }: CardLivroProps) {
   // função para deletar o livro, chamada quando o usuário confirma a exclusão no modal
   async function handleDeletar() {
     try {
-      // chama a API para deletar o livro pelo ID
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-      const response = await fetch(`${API_URL}/livros/${id}`, {
-        method: "DELETE",
-      });
-
-      // se a resposta não for ok, exibe o erro retornado pela API ou uma mensagem genérica
-      if (!response.ok) {
-        const erro = await response.json();
-        toast.error(erro.message || "Erro ao excluir o livro");
-        return;
-      }
-
-      // se a exclusão for bem-sucedida, exibe uma notificação de sucesso e chama a função onDeletar para atualizar a lista de livros na página
+      await deletarLivro(id);
       toast.success("Livro excluído com sucesso!");
       onDeletar?.(id);
-    } catch (error) {
-      toast.error("Erro ao excluir o livro");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Erro ao excluir o livro");
     } finally {
       setMostrarModal(false);
     }

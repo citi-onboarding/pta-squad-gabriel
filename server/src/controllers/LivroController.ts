@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Crud } from "../global";
 import prisma from "@database";
-import { Status, Categoria } from "@prisma/client";
+import { Status } from "@prisma/client";
 
 class LivroController implements Crud {
   private isEmprestimoAtrasado(emprestimo: any) {
@@ -32,8 +32,7 @@ class LivroController implements Crud {
         categoria,
         foto_url,
       } = request.body;
-
-      // Validação dos campos obrigatórios
+      //Valida campos obrigatorios
       if (
         !titulo ||
         !autor ||
@@ -47,19 +46,13 @@ class LivroController implements Crud {
           .status(400)
           .json({ message: "Todos os campos são obrigatórios." });
       }
-
-      // Valida ISBN
+      //Valida ISBN
       const isbn_regex = /^(?:\d{10}|\d{13})$/;
       if (typeof isbn !== "string" || !isbn_regex.test(isbn)) {
         return response.status(400).json({ message: "ISBN inválido." });
       }
 
-      // Valida se categoria é válida no enum
-      if (!Object.values(Categoria).includes(categoria)) {
-        return response.status(400).json({
-          message: `Categoria inválida. Valores aceitos: ${Object.values(Categoria).join(", ")}`,
-        });
-      }
+      const quantidade_disponivel = quantidade_total;
 
       const createdLivro = await prisma.livro.create({
         data: {
@@ -69,8 +62,8 @@ class LivroController implements Crud {
           editora,
           ano: Number(ano),
           quantidade_total: Number(quantidade_total),
-          quantidade_disponivel: Number(quantidade_total),
-          categoria: categoria as Categoria, // cast explícito
+          quantidade_disponivel: Number(quantidade_disponivel),
+          categoria,
           foto_url: foto_url || null,
         },
       });
@@ -80,7 +73,6 @@ class LivroController implements Crud {
         livro: createdLivro,
       });
     } catch (error) {
-      console.error("Erro ao cadastrar livro:", error); // mantém por enquanto para debug
       return response.status(400).json({ message: "Erro ao cadastrar livro" });
     }
   };
