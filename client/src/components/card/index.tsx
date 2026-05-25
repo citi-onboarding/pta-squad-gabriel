@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { Eye, Bookmark, Trash2 } from "lucide-react";
 // botao shadcn
 import { Button } from "@/components/ui/button";
@@ -11,15 +10,15 @@ import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
 import historiaImg from "../../../../assets/categoriasCard/historia.png";
 import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
 import infantilImg from "../../../../assets/categoriasCard/infantil.png";
+import { LivroResumido } from "@/types";
+import { Categoria } from "@/types";
 
 interface CardLivroProps {
-  titulo: string;
-  autor: string;
-  categoria: string;
-  quantidade: number;
+  livro: LivroResumido;
+  onVerClick: (livro: LivroResumido) => void;
 }
 
-const imagensCategorias: { [key: string]: any } = {
+const imagensCategorias: Record<Categoria, any> = {
   Romance: romanceImg,
   Tecnologia: tecnologiaImg,
   Historia: historiaImg,
@@ -27,19 +26,18 @@ const imagensCategorias: { [key: string]: any } = {
   Infantil: infantilImg,
 };
 
-export default function Card({
-  titulo,
-  autor,
-  categoria,
-  quantidade,
-}: CardLivroProps) {
+export default function Card({ livro, onVerClick }: CardLivroProps) {
+  const { titulo, autor, categoria, quantidade_total, quantidade_disponivel } =
+    livro;
+  const imagemCategoria = imagensCategorias[categoria] ?? romanceImg;
+
   return (
     // div geral
     <div className="bg-green-100 border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
       {/* área da imagem */}
       <div className="w-full h-56 overflow-hidden">
         <Image
-          src={imagensCategorias[categoria]}
+          src={imagemCategoria}
           alt={categoria}
           width={400}
           height={208}
@@ -52,13 +50,14 @@ export default function Card({
         <p className="text-sm text-gray-500 mt-1">{autor}</p>
         <p className="text-sm text-emerald-500 mt-1">{categoria}</p>
         <p className="text-sm text-gray-500 mt-1">
-          Disponível: {quantidade} unidade(s)
+          Disponível: {quantidade_disponivel} unidade(s)
         </p>
 
         {/* botões */}
         <div className="flex gap-2 mt-4">
           {/* ver */}
           <Button
+            onClick={() => onVerClick(livro)}
             variant="outline"
             size="sm"
             className="h-9 bg-white border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-750"
@@ -68,10 +67,10 @@ export default function Card({
           {/* emprestar */}
           <Button
             size="sm"
-            disabled={quantidade === 0}
+            disabled={quantidade_disponivel === 0}
             className={`h-9 flex items-center gap-1 text-xs px-3 py-1.5 rounded-md
     ${
-      quantidade === 0
+      quantidade_disponivel === 0
         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
         : "bg-emerald-500 text-white hover:bg-emerald-600"
     }`}
