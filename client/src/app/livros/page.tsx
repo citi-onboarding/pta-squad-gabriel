@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+// componentes
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
 import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
-import { Emprestimo, LivroResumido, Livro } from "@/types/index";
-import { emprestimosMock } from "@/mocks/emprestimo";
-import { StatusEmprestimo } from "@/types/index";
-import { livrosMock } from "@/mocks/livro";
 
+// tipos
+import { Emprestimo, LivroResumido, Livro } from "@/types/index";
+import { StatusEmprestimo } from "@/types/index";
+
+// serviços
+import { getLivros, getLivroPorId } from "@/services/livrosService";
+
+// biblioteca para exibir notificações na tela
 export default function Livros() {
   const [filtros, setFiltros] = useState({
     busca: "",
@@ -16,17 +21,27 @@ export default function Livros() {
     disponibilidade: "",
   });
 
-  //logica do filtro
-  const livrosFiltrados = livrosMock.filter((livro) => {
-    const buscaMatch =
-      livro.titulo.toLowerCase().includes(filtros.busca.toLowerCase()) ||
-      livro.autor.toLowerCase().includes(filtros.busca.toLowerCase());
+  const [loading, setLoading] = useState(false);
+  const [livros, setLivros] = useState<LivroResumido[]>([]);
 
-    const categoriaMatch =
-      filtros.categoria === "" ||
-      filtros.categoria === "Todas" ||
-      livro.categoria.toLowerCase() === filtros.categoria.toLowerCase();
+  // busca os livros da API ao carregar a página e quando os filtros mudam
+  useEffect(() => {
+    async function buscar() {
+      try {
+        setLoading(true);
+        const dados = await getLivros(filtros);
+        setLivros(dados);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    buscar();
+  }, [filtros]);
 
+  // filtra os livros por disponibilidade no front
+  const livrosFiltrados = livros.filter((livro) => {
     const disponibilidadeMatch =
       filtros.disponibilidade === "" ||
       filtros.disponibilidade === "Todas" ||
@@ -35,19 +50,21 @@ export default function Livros() {
       (filtros.disponibilidade === "Indisponíveis" &&
         livro.quantidade_disponivel === 0);
 
-    return buscaMatch && categoriaMatch && disponibilidadeMatch;
+    return disponibilidadeMatch;
   });
 
-  const [loading, setLoading] = useState(false);
+  // remove o livro da listagem após deletar
+  function handleDeletar(id: string) {
+    setLivros(livros.filter((livro) => livro.id !== id));
+  }
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLivro, setSelectedLivro] = useState<Livro | null>(null);
-  const [selectedEmprestimos, setSelectedEmprestimos] = useState<Emprestimo[]>(
-    [],
-  );
-  const [emprestimosMap, setEmprestimosMap] =
-    useState<Record<string, Emprestimo[]>>(emprestimosMock);
+  const [emprestimosMap, setEmprestimosMap] = useState<
+    Record<string, Emprestimo[]>
+  >({});
 
+  // atualiza o status de um empréstimo
   const atualizarStatusEmprestimo = (
     livroId: string,
     emprestimoId: string,
@@ -61,11 +78,14 @@ export default function Livros() {
     });
   };
 
-  const handleVerClick = (livroResumido: LivroResumido) => {
-    const livroCompleto = livrosMock.find((l) => l.id === livroResumido.id);
-    if (livroCompleto) {
+  // busca o livro completo da API e abre o modal de detalhes
+  const handleVerClick = async (livroResumido: LivroResumido) => {
+    try {
+      const livroCompleto = await getLivroPorId(livroResumido.id);
       setSelectedLivro(livroCompleto);
       setModalOpen(true);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -90,10 +110,15 @@ export default function Livros() {
         ) : (
           <div className="mt-6 grid grid-cols-3 gap-4">
             {livrosFiltrados.map((livro) => (
-              <Card key={livro.id} livro={livro} onVerClick={handleVerClick} />
+              <Card
+                key={livro.id}
+                livro={livro}
+                onVerClick={handleVerClick}
+                onDeletar={handleDeletar}
+              />
             ))}
 
-            {/* mensagem caso n tenha nenhum livro daquele tipo */}
+            {/* mensagem caso não tenha nenhum livro */}
             {livrosFiltrados.length === 0 && (
               <div className="mt-6 flex flex-col items-center justify-center py-16 text-center w-full col-span-3">
                 <p className="text-gray-500 text-lg font-medium">
@@ -107,7 +132,7 @@ export default function Livros() {
           </div>
         )}
 
-        {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
+        {/* modal de detalhes do livro */}
         {selectedLivro && (
           <ModalDetalhesLivro
             open={modalOpen}
@@ -115,11 +140,10 @@ export default function Livros() {
               setModalOpen(open);
               if (!open) {
                 setSelectedLivro(null);
-                setSelectedEmprestimos([]);
               }
             }}
             livro={selectedLivro}
-            emprestimos={emprestimosMap[selectedLivro.id]}
+            emprestimos={emprestimosMap[selectedLivro.id] ?? []}
             onAtualizarStatus={atualizarStatusEmprestimo}
           />
         )}
