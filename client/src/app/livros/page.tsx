@@ -4,12 +4,23 @@ import { useState } from "react";
 import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
 import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
-import { Emprestimo, LivroResumido, Livro } from "@/types/index";
+import { ModalEmprestimo } from "@/components/ModalEmprestimo";
+import {
+  EmprestimoProps,
+  Emprestimo,
+  LivroResumido,
+  Livro,
+} from "@/types/index";
 import { emprestimosMock } from "@/mocks/emprestimo";
 import { StatusEmprestimo } from "@/types/index";
 import { livrosMock } from "@/mocks/livro";
+import { useRouter } from "next/navigation";
+import api from "@/lib/api";
+import { toast } from "sonner";
 
 export default function Livros() {
+  const router = useRouter();
+
   const [filtros, setFiltros] = useState({
     busca: "",
     categoria: "",
@@ -40,8 +51,11 @@ export default function Livros() {
 
   const [loading, setLoading] = useState(false);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedLivro, setSelectedLivro] = useState<Livro | null>(null);
+  const [modalDetalhesOpen, setModalDetalhesOpen] = useState(false);
+  const [modalEmprestarOpen, setModalEmprestarOpen] = useState(false);
+  const [selectedVerLivro, setSelectedVerLivro] = useState<Livro | null>(null);
+  const [selectedEmprestarLivro, setSelectedEmprestarLivro] =
+    useState<LivroResumido | null>(null);
   const [selectedEmprestimos, setSelectedEmprestimos] = useState<Emprestimo[]>(
     [],
   );
@@ -64,10 +78,27 @@ export default function Livros() {
   const handleVerClick = (livroResumido: LivroResumido) => {
     const livroCompleto = livrosMock.find((l) => l.id === livroResumido.id);
     if (livroCompleto) {
-      setSelectedLivro(livroCompleto);
-      setModalOpen(true);
+      setSelectedVerLivro(livroCompleto);
+      setModalDetalhesOpen(true);
     }
   };
+
+  const handleEmprestarClick = (livroResumido: LivroResumido) => {
+    if (livroResumido) {
+      setSelectedEmprestarLivro(livroResumido);
+      setModalEmprestarOpen(true);
+    }
+  };
+
+  async function handleConfirmarEmprestimo(emprestimo: EmprestimoProps) {
+    try {
+      await api.post("/emprestimos", emprestimo);
+      toast.success("Cadastrado com sucesso");
+      setModalEmprestarOpen(false);
+    } catch (error: any) {
+      toast.error(error.message || "Tente novamente.");
+    }
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7F9FA" }}>
@@ -76,12 +107,10 @@ export default function Livros() {
         <p className="text-gray-500 text-sm mt-1">
           Gerencie o acervo da biblioteca
         </p>
-
         {/* barra de busca */}
         <div className="mt-4">
           <BarraDeBuscar filtros={filtros} onChange={setFiltros} />
         </div>
-
         {/* loading state e o grid de livros */}
         {loading ? (
           <div className="mt-6 flex justify-center items-center py-16">
@@ -90,7 +119,12 @@ export default function Livros() {
         ) : (
           <div className="mt-6 grid grid-cols-3 gap-4">
             {livrosFiltrados.map((livro) => (
-              <Card key={livro.id} livro={livro} onVerClick={handleVerClick} />
+              <Card
+                key={livro.id}
+                livro={livro}
+                onVerClick={handleVerClick}
+                onEmprestarClick={handleEmprestarClick}
+              />
             ))}
 
             {/* mensagem caso n tenha nenhum livro daquele tipo */}
@@ -106,20 +140,33 @@ export default function Livros() {
             )}
           </div>
         )}
-
-        {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
-        {selectedLivro && (
-          <ModalDetalhesLivro
-            open={modalOpen}
+        {selectedEmprestarLivro && (
+          <ModalEmprestimo
+            open={modalEmprestarOpen}
             onOpenChange={(open) => {
-              setModalOpen(open);
+              setModalEmprestarOpen(open);
               if (!open) {
-                setSelectedLivro(null);
+                setSelectedEmprestarLivro(null);
+              }
+            }}
+            livro={selectedEmprestarLivro}
+            onConfirmEmprestar={handleConfirmarEmprestimo}
+          />
+        )}
+        ;
+        {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
+        {selectedVerLivro && (
+          <ModalDetalhesLivro
+            open={modalDetalhesOpen}
+            onOpenChange={(open) => {
+              setModalDetalhesOpen(open);
+              if (!open) {
+                setSelectedVerLivro(null);
                 setSelectedEmprestimos([]);
               }
             }}
-            livro={selectedLivro}
-            emprestimos={emprestimosMap[selectedLivro.id]}
+            livro={selectedVerLivro}
+            emprestimos={emprestimosMap[selectedVerLivro.id]}
             onAtualizarStatus={atualizarStatusEmprestimo}
           />
         )}

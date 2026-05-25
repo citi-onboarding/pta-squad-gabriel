@@ -16,6 +16,7 @@ import { Categoria } from "@/types";
 interface CardLivroProps {
   livro: LivroResumido;
   onVerClick: (livro: LivroResumido) => void;
+  onEmprestarClick: (livro: LivroResumido) => void;
 }
 
 const imagensCategorias: Record<Categoria, any> = {
@@ -26,7 +27,11 @@ const imagensCategorias: Record<Categoria, any> = {
   Infantil: infantilImg,
 };
 
-export default function Card({ livro, onVerClick }: CardLivroProps) {
+export default function Card({
+  livro,
+  onVerClick,
+  onEmprestarClick,
+}: CardLivroProps) {
   const { titulo, autor, categoria, quantidade_total, quantidade_disponivel } =
     livro;
   const imagemCategoria = imagensCategorias[categoria] ?? romanceImg;
@@ -66,6 +71,7 @@ export default function Card({ livro, onVerClick }: CardLivroProps) {
           </Button>
           {/* emprestar */}
           <Button
+            onClick={() => onEmprestarClick(livro)}
             size="sm"
             disabled={quantidade_disponivel === 0}
             className={`h-9 flex items-center gap-1 text-xs px-3 py-1.5 rounded-md
