@@ -7,28 +7,25 @@ import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
 import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
 import { ModalEmprestimo } from "@/components/ModalEmprestimo";
+import { emprestimosMock } from "@/mocks/emprestimo";
+import { livrosMock } from "@/mocks/livro";
+import api from "@/lib/api";
+import { toast } from "sonner";
+
+// tipos
 import {
   EmprestimoProps,
   Emprestimo,
   LivroResumido,
   Livro,
+  StatusEmprestimo,
 } from "@/types/index";
-import { emprestimosMock } from "@/mocks/emprestimo";
-import { StatusEmprestimo } from "@/types/index";
-import { livrosMock } from "@/mocks/livro";
-import { useRouter } from "next/navigation";
-import api from "@/lib/api";
-import { toast } from "sonner";
-
-// tipos
 
 // serviços
 import { getLivros, getLivroPorId } from "@/services/livrosService";
 
 // biblioteca para exibir notificações na tela
 export default function Livros() {
-  const router = useRouter();
-
   const [filtros, setFiltros] = useState({
     busca: "",
     categoria: "",
@@ -36,7 +33,11 @@ export default function Livros() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [livros, setLivros] = useState<LivroResumido[]>([]);
+  const [livros, setLivros] = useState<LivroResumido[]>(livrosMock || []);
+  const filtrosAtivos =
+    filtros.busca !== "" ||
+    filtros.categoria !== "" ||
+    filtros.disponibilidade !== "";
 
   // busca os livros da API ao carregar a página e quando os filtros mudam
   useEffect(() => {
@@ -73,8 +74,8 @@ export default function Livros() {
   }
 
   const [modalDetalhesOpen, setModalDetalhesOpen] = useState(false);
-  const [modalEmprestarOpen, setModalEmprestarOpen] = useState(false);
   const [selectedVerLivro, setSelectedVerLivro] = useState<Livro | null>(null);
+  const [modalEmprestarOpen, setModalEmprestarOpen] = useState(false);
   const [selectedEmprestarLivro, setSelectedEmprestarLivro] =
     useState<LivroResumido | null>(null);
   const [selectedEmprestimos, setSelectedEmprestimos] = useState<Emprestimo[]>(
@@ -96,11 +97,19 @@ export default function Livros() {
     });
   };
 
-  const handleVerClick = (livroResumido: LivroResumido) => {
-    const livroCompleto = livrosMock.find((l) => l.id === livroResumido.id);
-    if (livroCompleto) {
+  const handleVerClick = async (livroResumido: LivroResumido) => {
+    try {
+      const livroCompleto = await getLivroPorId(livroResumido.id);
       setSelectedVerLivro(livroCompleto);
       setModalDetalhesOpen(true);
+    } catch (err) {
+      console.error(err);
+      // fallback para ambiente sem API: abre modal com o mock local
+      const livroCompleto = livrosMock.find((l) => l.id === livroResumido.id);
+      if (livroCompleto) {
+        setSelectedVerLivro(livroCompleto as Livro);
+        setModalDetalhesOpen(true);
+      }
     }
   };
 
@@ -145,6 +154,7 @@ export default function Livros() {
                 livro={livro}
                 onVerClick={handleVerClick}
                 onEmprestarClick={handleEmprestarClick}
+                onDeletar={handleDeletar}
               />
             ))}
 
@@ -173,9 +183,8 @@ export default function Livros() {
             livro={selectedEmprestarLivro}
             onConfirmEmprestar={handleConfirmarEmprestimo}
           />
-        )}
-        ;
-        {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
+          )}
+          {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
         {selectedVerLivro && (
           <ModalDetalhesLivro
             open={modalDetalhesOpen}
