@@ -29,6 +29,7 @@ interface CardLivroProps {
   livro: LivroResumido;
   onVerClick: (livro: LivroResumido) => void;
   onDeletar?: (id: string) => void;
+  onEmprestarClick: (livro: LivroResumido) => void;
 }
 
 // mapa de categorias para imagens
@@ -41,7 +42,12 @@ const imagensCategorias: Record<Categoria, any> = {
 };
 
 // componente do card
-export default function Card({ livro, onVerClick, onDeletar }: CardLivroProps) {
+export default function Card({
+  livro,
+  onVerClick, 
+  onDeletar,
+  onEmprestarClick,
+}: CardLivroProps) {
   const [mostrarModal, setMostrarModal] = useState(false);
   const { id, titulo, autor, categoria, quantidade_disponivel } = livro;
   const imagemCategoria = imagensCategorias[categoria] ?? romanceImg;
@@ -124,7 +130,8 @@ export default function Card({ livro, onVerClick, onDeletar }: CardLivroProps) {
 
             {/* emprestar */}
             <Button
-              size="sm"
+              onClick={() => onEmprestarClick(livro)}
+            size="sm"
               disabled={quantidade_disponivel === 0}
               className={`h-9 flex items-center gap-1 text-xs px-3 py-1.5 rounded-md
                 ${
