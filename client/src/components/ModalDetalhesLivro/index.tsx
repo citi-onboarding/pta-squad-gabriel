@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+// componentes
 import {
   Dialog,
   DialogContent,
@@ -22,13 +23,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { MailIcon, Loader2 } from "lucide-react";
+
+// imagens categorias
 import romanceImg from "../../../../assets/categoriasCard/romance.png";
 import tecnologiaImg from "../../../../assets/categoriasCard/tecnologia.png";
 import historiaImg from "../../../../assets/categoriasCard/historia.png";
 import cienciasImg from "../../../../assets/categoriasCard/ciencias.png";
 import infantilImg from "../../../../assets/categoriasCard/infantil.png";
+
+// tipagem
 import { Categoria, Livro, Emprestimo, StatusEmprestimo } from "@/types/index";
 
+// mapa de categorias para imagens
 const imagensCategorias: Record<Categoria, any> = {
   Romance: romanceImg,
   Tecnologia: tecnologiaImg,
@@ -131,13 +137,23 @@ export function ModalDetalhesLivro({
 
         <div className="flex flex-col sm:flex-row gap-4 px-6 py-3">
           <div className="w-full sm:w-44 h-60 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-            <Image
-              src={livro.foto_url || imagensCategorias[livro.categoria]}
-              alt={`Capa de ${livro.titulo}`}
-              width={176}
-              height={248}
-              className="w-full h-full object-cover"
-            />
+            {livro.foto_url ? (
+              // URL externa — usa <img> comum
+              <img
+                src={livro.foto_url}
+                alt={`Capa de ${livro.titulo}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              // imagem local da categoria — usa <Image> do Next
+              <Image
+                src={imagensCategorias[livro.categoria]}
+                alt={`Capa de ${livro.titulo}`}
+                width={176}
+                height={248}
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
 
           <div className="flex-1 min-w-0 sm:pl-4">
