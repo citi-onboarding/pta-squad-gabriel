@@ -73,15 +73,32 @@ export default function Card({ livro, onVerClick, onDeletar }: CardLivroProps) {
 
       {/* div geral */}
       <div className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
-        {/* área da imagem */}
-        <div className="w-full h-56 overflow-hidden">
-          <Image
-            src={imagemCategoria}
-            alt={categoria}
-            width={400}
-            height={208}
-            className="object-cover w-full h-full"
-          />
+        {/* área da imagem — posição relativa para o badge */}
+        <div className="w-full h-56 overflow-hidden relative">
+          {livro.foto_url ? (
+            // URL externa — usa <img> comum
+            <img
+              src={livro.foto_url}
+              alt={categoria}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            // imagem local da categoria — usa <Image> do Next
+            <Image
+              src={imagemCategoria}
+              alt={categoria}
+              width={400}
+              height={208}
+              className="object-cover w-full h-full"
+            />
+          )}
+
+          {/* badge de indisponível no canto superior direito */}
+          {quantidade_disponivel === 0 && (
+            <span className="absolute top-2 right-2 text-xs font-medium px-2 py-0.5 rounded-full bg-red-500 text-white">
+              Indisponível
+            </span>
+          )}
         </div>
 
         {/* informações */}
