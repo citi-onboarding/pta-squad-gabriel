@@ -55,6 +55,9 @@ export function TabelaEmprestimos({
     livrosMap[livro.id] = livro.titulo;
   }
 
+  const formatarData = (data: string) =>
+    new Date(data).toLocaleDateString("pt-BR");
+
   const handleEnviarLembrete = (emprestimo: Emprestimo) => {
     alert(
       `Lembrete enviado para ${emprestimo.nome_cliente} (${emprestimo.email_cliente})`,
@@ -120,7 +123,7 @@ export function TabelaEmprestimos({
               <TableHead className="font-semibold w-[15%] whitespace-nowrap overflow-hidden text-slate-950 text-ellipsis">
                 Data de Devolução
               </TableHead>
-              <TableHead className="font-semibold w-[30%] whitespace-nowrap overflow-hidden text-slate-950 text-ellipsis text-center">
+              <TableHead className="font-semibold w-[20%] whitespace-nowrap overflow-hidden text-slate-950 text-ellipsis text-start">
                 Status
               </TableHead>
             </TableRow>
@@ -145,14 +148,14 @@ export function TabelaEmprestimos({
                     {emp.nome_cliente}
                   </TableCell>
                   <TableCell className="w-[15%] whitespace-nowrap overflow-hidden text-ellipsis">
-                    {emp.data_locacao}
+                    {formatarData(emp.data_locacao)}
                   </TableCell>
                   <TableCell className="w-[15%] whitespace-nowrap overflow-hidden text-ellipsis">
-                    {emp.data_prevista_devolucao}
+                    {formatarData(emp.data_prevista_devolucao)}
                   </TableCell>
                   <TableCell className="w-[30%]">
                     <div className="grid w-full grid-cols-1 gap-0.5 sm:grid-cols-[auto_auto] sm:items-center sm:min-h-8">
-                      <div className="shrink-0 flex items-center justify-center">
+                      <div className="shrink-0 flex items-center justify-start">
                         <StatusBadge status={emp.status} />
                       </div>
                       <div className="flex items-center gap-0.5 justify-center sm:justify-start h-8 min-w-0">

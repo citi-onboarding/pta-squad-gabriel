@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
 import { livrosMock } from "@/mocks/livro";
 import { emprestimosMock } from "@/mocks/emprestimo";
@@ -7,7 +7,7 @@ import { livrosPorCategoriaMock } from "@/mocks/LivroPorCategoria";
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-gray-300">
+    <div className="min-h-screen bg-slate-50">
       <main className="max-w-6xl mx-auto py-8 px-4">
         {/* Título e descrição da página */}
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
@@ -19,10 +19,12 @@ export default function DashboardPage() {
           {/* passa os dados mockados para o componente */}
           <GraficoLivros dados={livrosPorCategoriaMock} />
         </div>
-        <TabelaEmprestimos 
-        livros={livrosMock} 
-        emprestimos={emprestimosMock}
-        ></TabelaEmprestimos>
+        <div className="mt-8">
+          <TabelaEmprestimos
+            livros={livrosMock}
+            emprestimos={emprestimosMock}
+          ></TabelaEmprestimos>
+        </div>
       </main>
     </div>
   );
