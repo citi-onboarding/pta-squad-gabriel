@@ -125,9 +125,6 @@ const emprestimoController = {
         return res.status(404).json({ error: "Empréstimo não encontrado." });
       }
 
-      console.log("📧 Enviando email para:", emprestimo.email_cliente);
-      console.log("📖 Livro:", emprestimo.livro.titulo);
-
       // Chama o serviço de email passando os dados necessários
       await enviarLembrete({
         email_cliente: emprestimo.email_cliente,
@@ -137,10 +134,8 @@ const emprestimoController = {
         data_prevista_devolucao: emprestimo.data_prevista_devolucao,
       });
 
-      console.log("✅ Lembrete enviado!");
       return res.status(200).json({ message: "Lembrete enviado com sucesso!" });
     } catch (error) {
-      console.log("❌ ERRO NO CONTROLLER:", error);
       return res.status(500).json({ error: "Erro ao enviar lembrete." });
     }
   },
