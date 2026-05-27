@@ -14,6 +14,7 @@ app.use(
       "http://localhost:3001",
       "http://localhost:8081",
       "https://pta-squad-gabriel.vercel.app",
+      "https://pta-squad-gabriel-36l94tjxu-gabriel-ribeiro-lc-projects1.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
