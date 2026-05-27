@@ -9,7 +9,7 @@ export const emprestimosMock: Record<string, Emprestimo[]> = {
       nome_cliente: "João Silva",
       email_cliente: "joao@email.com",
       data_locacao: '07/04/2026',
-      data_prevista_devolucao: '14/04/2026',
+      data_prevista_devolucao: '07/07/2026',
       status: "Em_andamento",
     },
     {
