@@ -1,19 +1,26 @@
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon } from "lucide-react";
+
+type Cores = "blue" | "green" | "red" | "yellow" | "purple";
 
 interface CardMetricasProps {
-    valor: number,
-    descricao: string,
-    Icon: LucideIcon,
-    cor:string,
+  valor: number;
+  descricao: string;
+  Icon: LucideIcon;
+  cor: Cores;
 }
 
-function CardMetricas({ valor, descricao, Icon, cor = "blue" }: CardMetricasProps) {
+function CardMetricas({
+  valor,
+  descricao,
+  Icon,
+  cor = "blue",
+}: CardMetricasProps) {
   const cores = {
     blue: "bg-blue-100 text-blue-600",
     green: "bg-green-100 text-green-600",
     red: "bg-red-100 text-red-600",
     yellow: "bg-yellow-100 text-yellow-600",
-    purple: "bg-purple-100 text-purple-600"
+    purple: "bg-purple-100 text-purple-600",
   };
 
   return (
