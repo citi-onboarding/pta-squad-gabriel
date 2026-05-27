@@ -1,17 +1,31 @@
 import { Request, Response } from "express";
 import { Status } from "@prisma/client";
 import prisma from "@database";
+import { enviarLembrete } from "../services/emailService";
 
 const emprestimoController = {
-
   async create(req: Request, res: Response) {
     try {
-      const { livroId, nome_cliente, email_cliente, data_locacao, data_prevista_devolucao } = req.body;
+      const {
+        livroId,
+        nome_cliente,
+        email_cliente,
+        data_locacao,
+        data_prevista_devolucao,
+      } = req.body;
 
       // POST /emprestimos
       // Checa os campos obrigatórios
-      if (!livroId || !nome_cliente || !email_cliente || !data_locacao || !data_prevista_devolucao) {
-        return res.status(400).json({ error: "Todos os campos são obrigatórios." });
+      if (
+        !livroId ||
+        !nome_cliente ||
+        !email_cliente ||
+        !data_locacao ||
+        !data_prevista_devolucao
+      ) {
+        return res
+          .status(400)
+          .json({ error: "Todos os campos são obrigatórios." });
       }
 
       // checa o email
@@ -25,7 +39,9 @@ const emprestimoController = {
 
       // Checa se a data de devolução é anterior à data de locação
       if (devolucao < locacao) {
-        return res.status(400).json({ error: "Data de devolução não pode ser anterior à data de locação." });
+        return res.status(400).json({
+          error: "Data de devolução não pode ser anterior à data de locação.",
+        });
       }
 
       // Checa se o Livro existe e se há algum dele disponível
@@ -34,7 +50,9 @@ const emprestimoController = {
         return res.status(404).json({ error: "Livro não encontrado." });
       }
       if (livro.quantidade_disponivel <= 0) {
-        return res.status(400).json({ error: "Não há exemplares disponíveis para empréstimo." });
+        return res
+          .status(400)
+          .json({ error: "Não há exemplares disponíveis para empréstimo." });
       }
 
       // cria o emprestimo e decrementa a quantidade disponível do livro
@@ -93,17 +111,30 @@ const emprestimoController = {
   },
 
   // POST /emprestimos/:id/lembrete
-  // Placeholder 
+  // Placeholder
   async lembrete(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      const emprestimo = await prisma.emprestimo.findUnique({ where: { id } });
+      const emprestimo = await prisma.emprestimo.findUnique({
+        where: { id },
+        include: { livro: true }, //incluir dados do livro
+      });
+
       if (!emprestimo) {
         return res.status(404).json({ error: "Empréstimo não encontrado." });
       }
 
-      return res.status(200).json({ message: "Lembrete será enviado em breve." });
+      // Chama o serviço de email passando os dados necessários
+      await enviarLembrete({
+        email_cliente: emprestimo.email_cliente,
+        nome_cliente: emprestimo.nome_cliente,
+        nome_livro: emprestimo.livro.titulo,
+        data_locacao: emprestimo.data_locacao,
+        data_prevista_devolucao: emprestimo.data_prevista_devolucao,
+      });
+
+      return res.status(200).json({ message: "Lembrete enviado com sucesso!" });
     } catch (error) {
       return res.status(500).json({ error: "Erro ao enviar lembrete." });
     }
