@@ -1,6 +1,14 @@
-import { BookOpen, AlertCircle, Clock } from "lucide-react";
+import { Cores } from "@/types";
+import { BookOpen, AlertCircle, Clock, LucideIcon } from "lucide-react";
 
-export const mockStats = {
+type StatItem = {
+  valor: number;
+  descricao: string;
+  Icon: LucideIcon;
+  cor: Cores;
+};
+
+export const mockStats: Record<string, StatItem> = {
   totalLivros: {
     valor: 1247,
     descricao: "Total de Livros",

@@ -56,3 +56,5 @@ export interface EmprestimoProps {
   data_locacao: string;
   data_prevista_devolucao: string;
 }
+
+export type Cores = "blue" | "green" | "red" | "yellow" | "purple";

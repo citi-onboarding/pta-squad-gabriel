@@ -41,10 +41,18 @@ const imagensCategorias: Record<Categoria, any> = {
   Infantil: infantilImg,
 };
 
+const coresCategoria: Record<Categoria, string> = {
+  Romance: "bg-red-100 border-red-300",
+  Tecnologia: "bg-blue-100 border-blue-300",
+  Historia: "bg-orange-100 border-orange-300",
+  Ciencias: "bg-green-100 border-green-300",
+  Infantil: "bg-purple-100 border-purple-300",
+};
+
 // componente do card
 export default function Card({
   livro,
-  onVerClick, 
+  onVerClick,
   onDeletar,
   onEmprestarClick,
 }: CardLivroProps) {
@@ -78,7 +86,9 @@ export default function Card({
       )}
 
       {/* div geral */}
-      <div className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
+      <div
+        className={`${coresCategoria[categoria]} border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300`}
+      >
         {/* área da imagem — posição relativa para o badge */}
         <div className="w-full h-56 overflow-hidden relative">
           {livro.foto_url ? (
@@ -131,7 +141,7 @@ export default function Card({
             {/* emprestar */}
             <Button
               onClick={() => onEmprestarClick(livro)}
-            size="sm"
+              size="sm"
               disabled={quantidade_disponivel === 0}
               className={`h-9 flex items-center gap-1 text-xs px-3 py-1.5 rounded-md
                 ${

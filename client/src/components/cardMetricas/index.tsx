@@ -1,6 +1,6 @@
 import { LucideIcon } from "lucide-react";
 
-type Cores = "blue" | "green" | "red" | "yellow" | "purple";
+import { Cores } from "@/types";
 
 interface CardMetricasProps {
   valor: number;

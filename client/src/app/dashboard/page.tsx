@@ -1,5 +1,8 @@
 "use client";
 import CardMetricas from "@/components/cardMetricas";
+import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
+import { livrosMock } from "@/mocks/livro";
+import { emprestimosMock } from "@/mocks/emprestimo";
 import GraficoLivros from "@/components/GraficoLivros";
 import { mockStats } from "@/mocks/cards";
 import { livrosPorCategoriaMock } from "@/mocks/LivroPorCategoria";
@@ -37,6 +40,12 @@ export default function DashboardPage() {
           </h2>
           {/* passa os dados mockados para o componente */}
           <GraficoLivros dados={livrosPorCategoriaMock} />
+        </div>
+        <div className="mt-8">
+          <TabelaEmprestimos
+            livros={livrosMock}
+            emprestimos={emprestimosMock}
+          ></TabelaEmprestimos>
         </div>
       </main>
     </div>

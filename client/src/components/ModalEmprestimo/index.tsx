@@ -81,9 +81,7 @@ export function ModalEmprestimo({
     if (!formData.data_prevista_devolucao) {
       newErrors.data_prevista_devolucao = "Obrigatório";
       isValid = false;
-    } else if (
-      formData.data_prevista_devolucao < formData.data_locacao
-    ) {
+    } else if (formData.data_prevista_devolucao < formData.data_locacao) {
       newErrors.data_prevista_devolucao =
         "Data deve ser após a data de locação";
       isValid = false;
@@ -99,8 +97,8 @@ export function ModalEmprestimo({
   };
 
   const handleCancel = () => {
-    setConfirmDialogOpen(false)
-    onOpenChange(!open);
+    setConfirmDialogOpen(false);
+    onOpenChange(false);
     resetForms();
   };
 
@@ -118,7 +116,7 @@ export function ModalEmprestimo({
       setConfirmDialogOpen(false);
       onOpenChange(false);
     } catch (error) {
-      console.error(error || 'Erro ao cadastrar');
+      console.error(error || "Erro ao cadastrar");
     } finally {
       setLoading(false);
     }
@@ -280,17 +278,25 @@ export function ModalEmprestimo({
           </div>
         </div>
       </DialogContent>
-      <AlertDialog open={confirmDialogOpen} onOpenChange={handleCloseConfirmDialog}>
+      <AlertDialog
+        open={confirmDialogOpen}
+        onOpenChange={handleCloseConfirmDialog}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Empréstimo</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja realizar o empréstimo do livro "{livro.titulo}" para {formData.nome_cliente}?
+              Tem certeza que deseja realizar o empréstimo do livro "
+              {livro.titulo}" para {formData.nome_cliente}?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm} className="bg-emerald-500 w-full sm:w-auto" disabled={loading}>
+            <AlertDialogAction
+              onClick={handleConfirm}
+              className="bg-emerald-500 w-full sm:w-auto"
+              disabled={loading}
+            >
               {loading ? "Enviando..." : "Confirmar"}
             </AlertDialogAction>
           </AlertDialogFooter>
