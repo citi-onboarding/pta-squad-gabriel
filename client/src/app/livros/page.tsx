@@ -7,19 +7,11 @@ import BarraDeBuscar from "@/components/BarraDeBusca";
 import Card from "@/components/card";
 import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
 import { ModalEmprestimo } from "@/components/ModalEmprestimo";
-import { emprestimosMock } from "@/mocks/emprestimo";
-import { livrosMock } from "@/mocks/livro";
 import api from "@/lib/api";
 import { toast } from "sonner";
 
 // tipos
-import {
-  EmprestimoProps,
-  Emprestimo,
-  LivroResumido,
-  Livro,
-  StatusEmprestimo,
-} from "@/types/index";
+import { EmprestimoProps, LivroResumido, Livro } from "@/types/index";
 
 // serviços
 import { getLivros, getLivroPorId } from "@/services/livrosService";
@@ -33,11 +25,7 @@ export default function Livros() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [livros, setLivros] = useState<LivroResumido[]>(livrosMock || []);
-  const filtrosAtivos =
-    filtros.busca !== "" ||
-    filtros.categoria !== "" ||
-    filtros.disponibilidade !== "";
+  const [livros, setLivros] = useState<LivroResumido[]>([]);
 
   // busca os livros da API ao carregar a página e quando os filtros mudam
   useEffect(() => {
@@ -78,24 +66,6 @@ export default function Livros() {
   const [modalEmprestarOpen, setModalEmprestarOpen] = useState(false);
   const [selectedEmprestarLivro, setSelectedEmprestarLivro] =
     useState<LivroResumido | null>(null);
-  const [selectedEmprestimos, setSelectedEmprestimos] = useState<Emprestimo[]>(
-    [],
-  );
-  const [emprestimosMap, setEmprestimosMap] =
-    useState<Record<string, Emprestimo[]>>(emprestimosMock);
-
-  const atualizarStatusEmprestimo = (
-    livroId: string,
-    emprestimoId: string,
-    novoStatus: StatusEmprestimo,
-  ) => {
-    setEmprestimosMap((prev) => {
-      const emprestimosDoLivro = prev[livroId]?.map((emp) =>
-        emp.id === emprestimoId ? { ...emp, status: novoStatus } : emp,
-      );
-      return { ...prev, [livroId]: emprestimosDoLivro };
-    });
-  };
 
   const handleVerClick = async (livroResumido: LivroResumido) => {
     try {
@@ -104,12 +74,6 @@ export default function Livros() {
       setModalDetalhesOpen(true);
     } catch (err) {
       console.error(err);
-      // fallback para ambiente sem API: abre modal com o mock local
-      const livroCompleto = livrosMock.find((l) => l.id === livroResumido.id);
-      if (livroCompleto) {
-        setSelectedVerLivro(livroCompleto as Livro);
-        setModalDetalhesOpen(true);
-      }
     }
   };
 
@@ -123,10 +87,12 @@ export default function Livros() {
   async function handleConfirmarEmprestimo(emprestimo: EmprestimoProps) {
     try {
       await api.post("/emprestimos", emprestimo);
-      toast.success("Cadastrado com sucesso");
-      setModalEmprestarOpen(false);
+      toast.success("Empréstimo realizado com sucesso!");
+      const dados = await getLivros(filtros);
+      setLivros(dados);
     } catch (error: any) {
-      toast.error(error.message || "Tente novamente.");
+      toast.error(error.response?.data?.message || "Tente novamente.");
+      throw error;
     }
   }
 
@@ -183,8 +149,8 @@ export default function Livros() {
             livro={selectedEmprestarLivro}
             onConfirmEmprestar={handleConfirmarEmprestimo}
           />
-          )}
-          {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
+        )}
+        {/*Se tiver livro selecionado, renderiza o modal com props de abrir e fechar.*/}
         {selectedVerLivro && (
           <ModalDetalhesLivro
             open={modalDetalhesOpen}
@@ -192,12 +158,10 @@ export default function Livros() {
               setModalDetalhesOpen(open);
               if (!open) {
                 setSelectedVerLivro(null);
-                setSelectedEmprestimos([]);
               }
             }}
             livro={selectedVerLivro}
-            emprestimos={emprestimosMap[selectedVerLivro.id]}
-            onAtualizarStatus={atualizarStatusEmprestimo}
+            emprestimos={selectedVerLivro.emprestimos ?? []}
           />
         )}
       </div>
