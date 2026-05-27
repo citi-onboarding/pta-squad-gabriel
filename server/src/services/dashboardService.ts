@@ -20,7 +20,7 @@ class   dashboardService {
         ]);
 
         const latestLoans = latestLoansRaw.map(emprestimo => {
-            let statusDinamico = 'Em andamento';
+            let statusDinamico = 'Em_andamento';
 
             if(emprestimo.status === Status.Devolvido){
                 statusDinamico = 'Devolvido';
