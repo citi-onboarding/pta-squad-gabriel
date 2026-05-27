@@ -4,78 +4,86 @@ import { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Bookmark } from "lucide-react";
+import { EmprestimoProps, LivroResumido } from "@/types";
 
-type EmprestDataProps = {
-  livroId: string;
-  nome: string;
-  email: string;
-  dataLoc: Date;
-  dataDevol: Date;
+type ModalEmprestProps = {
+  livro: LivroResumido;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirmEmprestar: (emprestimo: EmprestimoProps) => Promise<void>;
 };
 
-type LivroMock = {
-  id: string;
-  titulo: string;
-};
-
-type EmprestProps = {
-  livro: LivroMock;
-  onConfirm: (dados: EmprestDataProps) => void;
-};
-
-export function Emprestimo({ livro, onConfirm }: EmprestProps) {
-  const [isOpen, setOpen] = useState(false);
+export function ModalEmprestimo({
+  livro,
+  open,
+  onOpenChange,
+  onConfirmEmprestar,
+}: ModalEmprestProps) {
   const [formData, setFormData] = useState({
-    nome: "",
-    email: "",
-    dataLoc: new Date().toISOString().split("T")[0], //Data de hoje("2026-05-18T14:30:00.000Z") --> ["2026-05-18", "14:30:00.000Z"] --> "2026-05-18"
-    dataDevol: "",
+    nome_cliente: "",
+    email_cliente: "",
+    data_locacao: new Date().toISOString().split("T")[0], //Data de hoje("2026-05-18T14:30:00.000Z") --> ["2026-05-18", "14:30:00.000Z"] --> "2026-05-18"
+    data_prevista_devolucao: "",
   });
   const [errors, setErrors] = useState({
-    nome: "",
-    email: "",
-    dataLoc: "",
-    dataDevol: "",
+    nome_cliente: "",
+    email_cliente: "",
+    data_locacao: "",
+    data_prevista_devolucao: "",
   });
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
-    const newErrors = { nome: "", email: "", dataLoc: "", dataDevol: "" };
+    const newErrors = {
+      nome_cliente: "",
+      email_cliente: "",
+      data_locacao: "",
+      data_prevista_devolucao: "",
+    };
     let isValid = true;
 
-    if (!formData.nome.trim()) {
-      newErrors.nome = "Nome é obrigatório";
+    if (!formData.nome_cliente.trim()) {
+      newErrors.nome_cliente = "Nome é obrigatório";
       isValid = false;
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!formData.email.trim()) {
-      newErrors.email = "Email é obrigatório";
+    if (!formData.email_cliente.trim()) {
+      newErrors.email_cliente = "Email é obrigatório";
       isValid = false;
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Email inválido";
-      isValid = false;
-    }
-
-    if (!formData.dataLoc) {
-      newErrors.dataLoc = "Obrigatório";
+    } else if (!emailRegex.test(formData.email_cliente)) {
+      newErrors.email_cliente = "Email inválido";
       isValid = false;
     }
 
-    if (!formData.dataDevol) {
-      newErrors.dataDevol = "Obrigatório";
+    if (!formData.data_locacao) {
+      newErrors.data_locacao = "Obrigatório";
       isValid = false;
-    } else if (new Date(formData.dataDevol) < new Date(formData.dataLoc)) {
-      newErrors.dataDevol = "Data deve ser após a data de locação";
+    }
+
+    if (!formData.data_prevista_devolucao) {
+      newErrors.data_prevista_devolucao = "Obrigatório";
+      isValid = false;
+    } else if (formData.data_prevista_devolucao < formData.data_locacao) {
+      newErrors.data_prevista_devolucao =
+        "Data deve ser após a data de locação";
       isValid = false;
     }
 
@@ -85,52 +93,59 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
 
   const handleSubmit = () => {
     if (!validateForm()) return;
-
-    onConfirm({
-      livroId: livro.id,
-      nome: formData.nome,
-      email: formData.email,
-      dataLoc: new Date(formData.dataLoc),
-      dataDevol: new Date(formData.dataDevol),
-    });
-    setOpen(false);
-    resetForms();
+    setConfirmDialogOpen(true);
   };
 
   const handleCancel = () => {
-    setOpen(false);
+    setConfirmDialogOpen(false);
+    onOpenChange(false);
     resetForms();
   };
 
+  const handleConfirm = async () => {
+    const emprestimoData: EmprestimoProps = {
+      livroId: livro.id,
+      ...formData,
+    };
+
+    setLoading(true);
+
+    try {
+      await onConfirmEmprestar(emprestimoData);
+      resetForms();
+      setConfirmDialogOpen(false);
+      onOpenChange(false);
+    } catch (error) {
+      console.error(error || "Erro ao cadastrar");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseConfirmDialog = (nextOpen: boolean) => {
+    if (!nextOpen && loading) return;
+    setConfirmDialogOpen(nextOpen);
+  };
+
   const resetForms = () => {
-    setErrors({ nome: "", email: "", dataLoc: "", dataDevol: "" });
-    setFormData({
-      nome: "",
-      email: "",
-      dataLoc: new Date().toISOString().split("T")[0],
-      dataDevol: "",
+    setErrors({
+      nome_cliente: "",
+      email_cliente: "",
+      data_locacao: "",
+      data_prevista_devolucao: "",
     });
-  }
+    setFormData({
+      nome_cliente: "",
+      email_cliente: "",
+      data_locacao: new Date().toISOString().split("T")[0],
+      data_prevista_devolucao: "",
+    });
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(novaSituacao) => {
-        if (!novaSituacao) {
-          resetForms();
-        }
-        setOpen(novaSituacao);
-      }}>
-      <DialogTrigger asChild>
-        <Button
-          variant="default"
-          className="bg-emerald-500 text-white h-12 w-36 rounded-lg flex items-center justify-center"
-        >
-          <Bookmark />
-          <span>Emprestar </span>
-        </Button>
-      </DialogTrigger>
-
-      { /* Responsividade em width*/ }
-      <DialogContent 
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* Responsividade em width*/}
+      <DialogContent
         className="
         w-[95%]           
         sm:w-[300px]      
@@ -165,68 +180,75 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
 
           {/* Nome */}
           <div className="space-y-1">
-            <Label htmlFor="nome">Nome do Cliente</Label>
+            <Label htmlFor="nome_cliente">Nome do Cliente</Label>
             <Input
-              id="nome"
+              id="nome_cliente"
               type="text"
               placeholder="Digite o nome do cliente"
-              value={formData.nome}
+              value={formData.nome_cliente}
               onChange={(e) =>
-                setFormData({ ...formData, nome: e.target.value })
+                setFormData({ ...formData, nome_cliente: e.target.value })
               }
             />
-              <div className="h-1 text-sm text-red-500">
-                {errors.nome && <span>{errors.nome}</span>}
-              </div>
+            <div className="h-1 text-sm text-red-500">
+              {errors.nome_cliente && <span>{errors.nome_cliente}</span>}
+            </div>
           </div>
 
           {/* Email */}
           <div className="space-y-1">
-            <Label htmlFor="email">Email do Cliente</Label>
+            <Label htmlFor="email_cliente">Email do Cliente</Label>
             <Input
-              id="email"
+              id="email_cliente"
               type="email"
               placeholder="Digite o email do cliente"
-              value={formData.email}
+              value={formData.email_cliente}
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
+                setFormData({ ...formData, email_cliente: e.target.value })
               }
             />
             <div className="h-1 text-sm text-red-500">
-                {errors.email && <span>{errors.email}</span>}
+              {errors.email_cliente && <span>{errors.email_cliente}</span>}
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4">
             {/* Data locação */}
             <div className="space-y-1">
-              <Label htmlFor="dataLoc">Data da Locação</Label>
-              <Input 
-              id="dataLoc"
-              type="date" 
-              value={formData.dataLoc}
-              onChange={(e) =>
-                setFormData({ ...formData, dataLoc: e.target.value })
+              <Label htmlFor="data_locacao">Data da Locação</Label>
+              <Input
+                id="data_locacao"
+                type="date"
+                value={formData.data_locacao}
+                onChange={(e) =>
+                  setFormData({ ...formData, data_locacao: e.target.value })
                 }
               />
               <div className="h-1 text-sm text-red-500">
-                {errors.dataLoc && <span>{errors.dataLoc}</span>}
+                {errors.data_locacao && <span>{errors.data_locacao}</span>}
               </div>
-          </div>
+            </div>
 
             {/* Data devolução */}
             <div className="space-y-1">
-              <Label htmlFor="dataDevol">Data Prevista de Devolução</Label>
-              <Input 
-              id="dataDevol"
-              type="date" 
-              value={formData.dataDevol}
-              onChange={(e) =>
-                setFormData({ ...formData, dataDevol: e.target.value })
+              <Label htmlFor="data_prevista_devolucao">
+                Data Prevista de Devolução
+              </Label>
+              <Input
+                id="data_prevista_devolucao"
+                type="date"
+                value={formData.data_prevista_devolucao}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    data_prevista_devolucao: e.target.value,
+                  })
                 }
               />
               <div className="h-1 text-sm text-red-500">
-                {errors.dataDevol && <span>{errors.dataDevol}</span>}
+                {errors.data_prevista_devolucao && (
+                  <span>{errors.data_prevista_devolucao}</span>
+                )}
               </div>
             </div>
           </div>
@@ -240,20 +262,46 @@ export function Emprestimo({ livro, onConfirm }: EmprestProps) {
               <Button
                 variant="outline"
                 onClick={handleCancel}
+                disabled={loading}
                 className="border-2 border-emerald-500 text-emerald-500 w-full sm:w-auto"
               >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSubmit}
+                disabled={loading}
                 className="bg-emerald-500 w-full sm:w-auto"
               >
-                Confirmar Empréstimo
+                {loading ? "Enviando..." : "Confirmar Empréstimo"}
               </Button>
             </div>
           </div>
         </div>
       </DialogContent>
+      <AlertDialog
+        open={confirmDialogOpen}
+        onOpenChange={handleCloseConfirmDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Empréstimo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja realizar o empréstimo do livro "
+              {livro.titulo}" para {formData.nome_cliente}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirm}
+              className="bg-emerald-500 w-full sm:w-auto"
+              disabled={loading}
+            >
+              {loading ? "Enviando..." : "Confirmar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

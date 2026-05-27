@@ -275,13 +275,17 @@ export function ModalDetalhesLivro({
                     <span>
                       Locação:{" "}
                       <span className="text-gray-900">
-                        {emprestimo.data_locacao}
+                        {new Date(emprestimo.data_locacao).toLocaleDateString(
+                          "pt-BR",
+                        )}
                       </span>
                     </span>
                     <span>
                       Previsão:{" "}
                       <span className="text-gray-900">
-                        {emprestimo.data_prevista_devolucao}
+                        {new Date(
+                          emprestimo.data_prevista_devolucao,
+                        ).toLocaleDateString("pt-BR")}
                       </span>
                     </span>
                   </div>
