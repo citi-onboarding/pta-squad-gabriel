@@ -1,51 +1,117 @@
 "use client";
+
+import { useState, useEffect } from "react";
 import CardMetricas from "@/components/cardMetricas";
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
-import { livrosMock } from "@/mocks/livro";
-import { emprestimosMock } from "@/mocks/emprestimo";
 import GraficoLivros from "@/components/GraficoLivros";
 import { mockStats } from "@/mocks/cards";
-import { livrosPorCategoriaMock } from "@/mocks/LivroPorCategoria";
+import { getDashboard, DashboardData } from "@/services/dashboardService";
+import { LivroResumido, Emprestimo } from "@/types";
 
 export default function DashboardPage() {
+  const [dados, setDados] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // busca os dados do dashboard ao montar a página
+  useEffect(() => {
+    async function buscar() {
+      try {
+        setLoading(true);
+        const data = await getDashboard();
+        setDados(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    buscar();
+  }, []);
+
+  // adapta latestLoans para o formato da TabelaEmprestimos
+  const livrosAdaptados: LivroResumido[] = (dados?.latestLoans ?? []).map((loan) => ({
+    id: loan.id,
+    titulo: loan.livro,
+    autor: "-",
+    categoria: "Romance",
+    quantidade_total: 0,
+    quantidade_disponivel: 0,
+  }));
+
+    // adapta booksByCategory para o formato do gráfico
+  const dadosGrafico = (dados?.booksByCategory ?? []).map((item: any) => ({
+    categoria: item.categoria,
+    quantidade: item._count.id,
+  }));
+
+  const emprestimosAdaptados: Record<string, Emprestimo[]> = {};
+  for (const loan of dados?.latestLoans ?? []) {
+    emprestimosAdaptados[loan.id] = [{
+      id: loan.id,
+      livroId: loan.id,
+      nome_cliente: "-",
+      email_cliente: "-",
+      data_locacao: loan.data,
+      data_prevista_devolucao: loan.data,
+      status: loan.status as any,
+    }];
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="max-w-6xl mx-auto py-8 px-4">
         {/* Título e descrição da página */}
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
         <p className="text-gray-500 text-sm mt-1">Visão geral da biblioteca</p>
+
+        {/* Cards de métricas */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <CardMetricas
-            valor={mockStats.totalLivros.valor}
+            valor={dados?.metrics.totalBooks ?? 0}
             descricao={mockStats.totalLivros.descricao}
             Icon={mockStats.totalLivros.Icon}
             cor={mockStats.totalLivros.cor}
           />
           <CardMetricas
-            valor={mockStats.emprestimosAtivos.valor}
+            valor={dados?.metrics.activeLoans ?? 0}
             descricao={mockStats.emprestimosAtivos.descricao}
             Icon={mockStats.emprestimosAtivos.Icon}
             cor={mockStats.emprestimosAtivos.cor}
           />
           <CardMetricas
-            valor={mockStats.livrosAtraso.valor}
+            valor={dados?.metrics.overdueLoans ?? 0}
             descricao={mockStats.livrosAtraso.descricao}
             Icon={mockStats.livrosAtraso.Icon}
             cor={mockStats.livrosAtraso.cor}
           />
         </div>
+
+        {/* Gráfico de livros por categoria */}
         <div className="mt-8 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <h2 className="text-base font-semibold text-gray-800 mb-4">
             Livros por Categoria
           </h2>
-          {/* passa os dados mockados para o componente */}
-          <GraficoLivros dados={livrosPorCategoriaMock} />
+          {loading ? (
+            <div className="flex justify-center items-center h-[300px]">
+              <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <GraficoLivros dados={dadosGrafico} />
+          )}
         </div>
+
+        {/* Tabela de últimos empréstimos */}
         <div className="mt-8">
-          <TabelaEmprestimos
-            livros={livrosMock}
-            emprestimos={emprestimosMock}
-          ></TabelaEmprestimos>
+          {loading ? (
+            <div className="flex justify-center items-center py-16">
+              <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <TabelaEmprestimos
+              livros={livrosAdaptados}
+              emprestimos={emprestimosAdaptados}
+            />
+          )}
         </div>
       </main>
     </div>
