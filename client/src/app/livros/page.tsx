@@ -105,7 +105,7 @@ export default function Livros() {
       const novoLivro = await getLivroPorId(emprestimo.livroId)
       setSelectedVerLivro(novoLivro)
     } catch (error) {
-      
+      toast.error("Erro ao processar devolução. Tente novamente.");
     }
   }
 
