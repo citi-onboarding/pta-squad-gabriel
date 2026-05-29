@@ -1,8 +1,8 @@
 import { View, Text } from "react-native";
-import HeaderMobile from "./components/Header";
+import HeaderMobile from "../src/components/Header";
 
 const App: React.FC = () => (
-  <View >
+  <View>
     <HeaderMobile />
   </View>
 );
