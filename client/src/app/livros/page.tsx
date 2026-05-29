@@ -11,10 +11,11 @@ import api from "@/lib/api";
 import { toast } from "sonner";
 
 // tipos
-import { EmprestimoProps, LivroResumido, Livro } from "@/types/index";
+import { EmprestimoProps, Emprestimo, LivroResumido, Livro } from "@/types/index";
 
 // serviços
 import { getLivros, getLivroPorId } from "@/services/livrosService";
+import { devolverEmprestimo } from "@/services/emprestimoService";
 
 // biblioteca para exibir notificações na tela
 export default function Livros() {
@@ -96,6 +97,18 @@ export default function Livros() {
     }
   }
 
+  async function handleConfirmarDevolucao(emprestimo: Emprestimo) {
+    try {
+      await devolverEmprestimo(emprestimo.id);
+      toast.success('Livro devolvido com sucesso!');
+
+      const novoLivro = await getLivroPorId(emprestimo.livroId)
+      setSelectedVerLivro(novoLivro)
+    } catch (error) {
+      
+    }
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7F9FA" }}>
       <div className="max-w-6xl mx-auto px-4 py-6">
@@ -162,6 +175,7 @@ export default function Livros() {
             }}
             livro={selectedVerLivro}
             emprestimos={selectedVerLivro.emprestimos ?? []}
+            onConfirmDevolucao={handleConfirmarDevolucao}
           />
         )}
       </div>
