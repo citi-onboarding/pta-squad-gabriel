@@ -42,11 +42,11 @@ const imagensCategorias: Record<Categoria, any> = {
 };
 
 const coresCategoria: Record<Categoria, string> = {
-  Romance: "bg-red-100 border-red-300",
-  Tecnologia: "bg-blue-100 border-blue-300",
-  Historia: "bg-orange-100 border-orange-300",
-  Ciencias: "bg-green-100 border-green-300",
-  Infantil: "bg-purple-100 border-purple-300",
+  Romance: "bg-white border-gray-200",
+  Tecnologia: "bg-white border-gray-200",
+  Historia: "bg-white border-gray-200",
+  Ciencias: "bg-white border-gray-200",
+  Infantil: "bg-white border-gray-200",
 };
 
 // componente do card
