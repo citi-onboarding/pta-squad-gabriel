@@ -48,11 +48,7 @@ interface ModalDetalhesLivroProps {
   onOpenChange: (open: boolean) => void;
   livro: Livro;
   emprestimos: Emprestimo[];
-  onAtualizarStatus?: (
-    livroId: string,
-    emprestimoId: string,
-    novoStatus: StatusEmprestimo,
-  ) => void;
+  onConfirmDevolucao: (emprestimo: Emprestimo) => Promise<void>;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -87,7 +83,7 @@ export function ModalDetalhesLivro({
   onOpenChange,
   livro,
   emprestimos,
-  onAtualizarStatus,
+  onConfirmDevolucao,
 }: ModalDetalhesLivroProps) {
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -98,14 +94,10 @@ export function ModalDetalhesLivro({
     );
   };
 
-  const handleConfirmarDevolucao = async (emprestimoId: string) => {
+  const handleConfirmarDevolucao = async (emprestimo: Emprestimo) => {
     setConfirmandoId(null);
-    setLoadingId(emprestimoId);
-    onAtualizarStatus?.(
-      livro.id,
-      emprestimoId,
-      "Devolvido" as StatusEmprestimo,
-    );
+    setLoadingId(emprestimo.id);
+    await onConfirmDevolucao(emprestimo);
     setLoadingId(null);
   };
 
@@ -313,7 +305,7 @@ export function ModalDetalhesLivro({
               <AlertDialogAction
                 className="bg-emerald-500 hover:bg-emerald-600 text-white"
                 onClick={() =>
-                  confirmandoId && handleConfirmarDevolucao(confirmandoId)
+                  confirmandoId && handleConfirmarDevolucao(emprestimos.find((e) => e.id === confirmandoId)!)
                 }
               >
                 Confirmar
