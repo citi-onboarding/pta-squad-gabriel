@@ -35,6 +35,7 @@ import {
 type TabelaEmprestimoProps = {
   livros: LivroResumido[];
   emprestimos: Record<string, Emprestimo[]>;
+  onConfirmarDevolucao?: (emprestimoId: string) => Promise<void>;
 };
 
 type FilterStatus = StatusEmprestimo | "Todos";
@@ -42,6 +43,7 @@ type FilterStatus = StatusEmprestimo | "Todos";
 export function TabelaEmprestimos({
   livros,
   emprestimos,
+  onConfirmarDevolucao,
 }: TabelaEmprestimoProps) {
   const [statusFilter, setStatusFilter] = useState<FilterStatus | undefined>(
     undefined,
@@ -70,6 +72,7 @@ export function TabelaEmprestimos({
   ) => {
     setConfirmandoId(null);
     setLoadingId(emprestimoId);
+    await onConfirmarDevolucao?.(emprestimoId);
     setEmprestimosState((prev) => ({
       ...prev,
       [livroId]: prev[livroId]?.map((emp) =>

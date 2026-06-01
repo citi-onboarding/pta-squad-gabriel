@@ -7,6 +7,8 @@ import GraficoLivros from "@/components/GraficoLivros";
 import { mockStats } from "@/mocks/cards";
 import { getDashboard, DashboardData } from "@/services/dashboardService";
 import { LivroResumido, Emprestimo } from "@/types";
+import { devolverEmprestimo } from "@/services/emprestimoService";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
   const [dados, setDados] = useState<DashboardData | null>(null);
@@ -56,6 +58,15 @@ export default function DashboardPage() {
         status: loan.status as any,
       },
     ];
+  }
+
+  async function handleConfirmarDevolucao(emprestimoId: string) {
+    try {
+      await devolverEmprestimo(emprestimoId);
+      toast.success("Livro devolvido com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao processar devolução. Tente novamente.");
+    }
   }
 
   return (
@@ -110,6 +121,7 @@ export default function DashboardPage() {
             <TabelaEmprestimos
               livros={livrosAdaptados}
               emprestimos={emprestimosAdaptados}
+              onConfirmarDevolucao={handleConfirmarDevolucao}
             />
           )}
         </div>
