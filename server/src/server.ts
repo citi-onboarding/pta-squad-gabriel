@@ -7,19 +7,7 @@ import "@database";
 dotenv.config();
 
 const app = express();
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:8081",
-      "https://pta-squad-gabriel.vercel.app",
-      "https://pta-squad-gabriel-36l94tjxu-gabriel-ribeiro-lc-projects1.vercel.app",
-    ],
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
+app.use(cors());
 app.use(express.json());
 app.use(routes);
 app.use(express.static(__dirname + "/public"));
