@@ -172,7 +172,10 @@ class LivroController implements Crud {
           .json({ message: "Livro está emprestado no momento." });
       }
 
-      const deletedLivro = await prisma.livro.delete({ where: { id } });
+      const [, deletedLivro] = await prisma.$transaction([
+        prisma.emprestimo.deleteMany({ where: { livroId: id } }),
+        prisma.livro.delete({ where: { id } }),
+      ]);
 
       return response
         .status(200)
