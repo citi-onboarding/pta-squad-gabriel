@@ -2,6 +2,7 @@ import React from "react";
 import { View, StatusBar } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../contexts/ThemeContext";
+import BarraDeBusca from "../BarraDeBusca";
 
 interface ThemeProviderViewProps {
   children: React.ReactNode;
@@ -28,6 +29,8 @@ export default function ThemeProviderView({
         barStyle="dark-content"
         backgroundColor={theme.colors.background}
       />
+
+      <BarraDeBusca onBuscar={async (busca) => {}} />
       {children}
     </View>
   );
