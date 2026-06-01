@@ -12,7 +12,6 @@ export default function DashboardPage() {
   const [dados, setDados] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // busca os dados do dashboard ao montar a página
   useEffect(() => {
     async function buscar() {
       try {
@@ -28,39 +27,40 @@ export default function DashboardPage() {
     buscar();
   }, []);
 
-  // adapta latestLoans para o formato da TabelaEmprestimos
-  const livrosAdaptados: LivroResumido[] = (dados?.latestLoans ?? []).map((loan) => ({
-    id: loan.id,
-    titulo: loan.livro,
-    autor: "-",
-    categoria: "Romance",
-    quantidade_total: 0,
-    quantidade_disponivel: 0,
-  }));
+  const livrosAdaptados: LivroResumido[] = (dados?.latestLoans ?? []).map(
+    (loan) => ({
+      id: loan.id,
+      titulo: loan.livro,
+      autor: "-",
+      categoria: "Romance",
+      quantidade_total: 0,
+      quantidade_disponivel: 0,
+    }),
+  );
 
-    // adapta booksByCategory para o formato do gráfico
-  const dadosGrafico = (dados?.booksByCategory ?? []).map((item: any) => ({
+  const dadosGrafico = (dados?.booksByCategory ?? []).map((item) => ({
     categoria: item.categoria,
-    quantidade: item._count.id,
+    quantidade: item.quantidade,
   }));
 
   const emprestimosAdaptados: Record<string, Emprestimo[]> = {};
   for (const loan of dados?.latestLoans ?? []) {
-    emprestimosAdaptados[loan.id] = [{
-      id: loan.id,
-      livroId: loan.id,
-      nome_cliente: "-",
-      email_cliente: "-",
-      data_locacao: loan.data,
-      data_prevista_devolucao: loan.data,
-      status: loan.status as any,
-    }];
+    emprestimosAdaptados[loan.id] = [
+      {
+        id: loan.id,
+        livroId: loan.id,
+        nome_cliente: "-",
+        email_cliente: "-",
+        data_locacao: loan.data,
+        data_prevista_devolucao: loan.data,
+        status: loan.status as any,
+      },
+    ];
   }
 
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="max-w-6xl mx-auto py-8 px-4">
-        {/* Título e descrição da página */}
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
         <p className="text-gray-500 text-sm mt-1">Visão geral da biblioteca</p>
 
