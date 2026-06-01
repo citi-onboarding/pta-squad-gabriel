@@ -14,8 +14,11 @@ export interface DashboardData {
   latestLoans: {
     id: string;
     livro: string;
+    nome_cliente: string;
+    email_cliente: string;
     status: string;
-    data: string;
+    data_locacao: string;
+    data_prevista_devolucao: string;
   }[];
 }
 

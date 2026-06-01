@@ -32,8 +32,11 @@ class   dashboardService {
             return {
             id: emprestimo.id,
             livro: emprestimo.livro.titulo,
+            nome_cliente: emprestimo.nome_cliente,
+            email_cliente: emprestimo.email_cliente,
             status: statusDinamico,
-            data: emprestimo.data_locacao,
+            data_locacao: emprestimo.data_locacao,
+            data_prevista_devolucao: emprestimo.data_prevista_devolucao,
         };
     });
 

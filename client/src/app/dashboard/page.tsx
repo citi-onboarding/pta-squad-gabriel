@@ -49,10 +49,10 @@ export default function DashboardPage() {
       {
         id: loan.id,
         livroId: loan.id,
-        nome_cliente: "-",
-        email_cliente: "-",
-        data_locacao: loan.data,
-        data_prevista_devolucao: loan.data,
+        nome_cliente: loan.nome_cliente,
+        email_cliente: loan.email_cliente,
+        data_locacao: loan.data_locacao,
+        data_prevista_devolucao: loan.data_prevista_devolucao,
         status: loan.status as any,
       },
     ];
