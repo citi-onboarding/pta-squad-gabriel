@@ -33,13 +33,15 @@ async function countOverdueLoans(): Promise<number>{
 
 //agrupamento 
 
-async function groupByLivros(){
-    return await prisma.livro.groupBy({
-        by: ['categoria'],
-        _count: {
-            id: true,
-        }
-    });
+async function groupByLivros(): Promise<{ categoria: string; quantidade: number }[]> {
+    const livros = await prisma.livro.findMany({ select: { categoria: true } });
+
+    const counts: Record<string, number> = {};
+    for (const livro of livros) {
+        counts[livro.categoria] = (counts[livro.categoria] ?? 0) + 1;
+    }
+
+    return Object.entries(counts).map(([categoria, quantidade]) => ({ categoria, quantidade }));
 }
 
 async function findLatestLoans(): Promise<any[]> {

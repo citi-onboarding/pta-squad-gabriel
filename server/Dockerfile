@@ -16,7 +16,7 @@ RUN yarn generate
 
 COPY --chown=node:node . .
 
-RUN chown -R node:node /home/node/app/node_modules/.prisma
+RUN chown -R node:node /home/node/app/node_modules/.prisma /home/node/app/node_modules/prisma
 
 USER node
 
