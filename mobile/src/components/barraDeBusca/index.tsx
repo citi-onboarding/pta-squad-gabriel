@@ -1,4 +1,11 @@
-import { Text, View, TextInput, TouchableOpacity } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { useState } from "react";
 import { Search } from "lucide-react-native";
 
@@ -15,34 +22,67 @@ export default function BarraDeBusca({ onBuscar }: BarraDeBuscaProps) {
       setError("Por favor, preencha o campo de busca");
       return;
     }
-
     setError("");
     await onBuscar(busca);
   };
 
   return (
-    <View className="grid items-center gap-2 px-3 py-3">
-      <View className="flex-1 flex-row rounded-xl border border-slate-200 bg-white px-3 py-2">
-        <Search size={18} color="#64748b" className="my-1 shrink-0" />
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <Search size={18} color="#64748b" />
         <TextInput
           placeholder="Nome"
           value={busca}
           onChangeText={setBusca}
-          className="ml-2 text-slate-900 text-lg"
+          style={styles.input}
           placeholderTextColor="#94a3b8"
         />
       </View>
 
-      {error ? (
-        <Text className="text-red-500 text-sm">{error}</Text>
-      ) : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <TouchableOpacity
-        onPress={handleBuscar}
-        className="rounded-xl bg-emerald-500 px-3 py-3 items-center"
-      >
-        <Text className="font-semibold text-white">Buscar</Text>
+      <TouchableOpacity onPress={handleBuscar} style={styles.botao}>
+        <Text style={styles.botaoTexto}>Buscar</Text>
       </TouchableOpacity>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    backgroundColor: "white",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#0f172a",
+  },
+  error: {
+    color: "#ef4444",
+    fontSize: 14,
+  },
+  botao: {
+    backgroundColor: "#10b981",
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  botaoTexto: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+});
