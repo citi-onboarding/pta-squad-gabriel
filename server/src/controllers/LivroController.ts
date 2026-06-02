@@ -1,25 +1,9 @@
 import { Request, Response } from "express";
 import { Crud } from "../global";
-import prisma from "@database";
-import { Status } from "@prisma/client";
+import livroService from "../services/livroService";
+import { LivroResponse, LivroWithEmprestimos } from "src/types";
 
 class LivroController implements Crud {
-  private isEmprestimoAtrasado(emprestimo: any) {
-    const hoje = new Date();
-    const data_prevista = new Date(emprestimo.data_prevista_devolucao);
-    //Verifica se esta atrasado pela data e se nao foi devolvido
-    return hoje > data_prevista && emprestimo.status !== Status.Devolvido;
-  }
-  private isEmprestimoAtivo(emprestimo: any) {
-    if (
-      emprestimo.status === Status.Em_andamento ||
-      this.isEmprestimoAtrasado(emprestimo)
-    )
-      return true;
-
-    return false;
-  }
-
   create = async (request: Request, response: Response) => {
     try {
       const {
@@ -32,40 +16,19 @@ class LivroController implements Crud {
         categoria,
         foto_url,
       } = request.body;
-      //Valida campos obrigatorios
-      if (
-        !titulo ||
-        !autor ||
-        !isbn ||
-        !editora ||
-        ano === undefined ||
-        quantidade_total === undefined ||
-        !categoria
-      ) {
-        return response
-          .status(400)
-          .json({ message: "Todos os campos são obrigatórios." });
-      }
-      //Valida ISBN
-      const isbn_regex = /^(?:\d{10}|\d{13})$/;
-      if (typeof isbn !== "string" || !isbn_regex.test(isbn)) {
-        return response.status(400).json({ message: "ISBN inválido." });
-      }
 
-      const quantidade_disponivel = quantidade_total;
+      const quantidade_disponivel = Number(quantidade_total);
 
-      const createdLivro = await prisma.livro.create({
-        data: {
-          titulo,
-          autor,
-          isbn,
-          editora,
-          ano: Number(ano),
-          quantidade_total: Number(quantidade_total),
-          quantidade_disponivel: Number(quantidade_disponivel),
-          categoria,
-          foto_url: foto_url || null,
-        },
+      const createdLivro: LivroResponse = await livroService.createLivro({
+        titulo,
+        autor,
+        isbn,
+        editora,
+        ano: Number(ano),
+        quantidade_total: Number(quantidade_total),
+        quantidade_disponivel: Number(quantidade_disponivel),
+        categoria,
+        foto_url: foto_url || null,
       });
 
       return response.status(201).json({
@@ -81,27 +44,11 @@ class LivroController implements Crud {
     try {
       const { titulo, autor, categoria } = request.query;
 
-      const where: any = {};
-
-      if (titulo) {
-        where.titulo = {
-          contains: String(titulo),
-          mode: "insensitive",
-        };
-      }
-
-      if (autor) {
-        where.autor = {
-          contains: String(autor),
-          mode: "insensitive",
-        };
-      }
-
-      if (categoria) {
-        where.categoria = categoria;
-      }
-
-      const livros = await prisma.livro.findMany({ where });
+      const livros: LivroResponse[] = await livroService.getAllLivros({
+        titulo,
+        autor,
+        categoria,
+      });
 
       return response.status(200).json(livros);
     } catch (error) {
@@ -113,36 +60,12 @@ class LivroController implements Crud {
     const { id } = request.params;
 
     try {
-      const livro = await prisma.livro.findUnique({
-        where: { id },
-        include: { emprestimos: true }, //Inclui os emprestimos do livro
-      });
-
-      if (!livro) {
-        return response
-          .status(404)
-          .json({ message: "Nenhum livro encontrado." });
-      }
-
-      const emprestimosAtualizados = livro.emprestimos.map((emprestimo) => {
-        // Copia do emprestimo
-        const tempEmprestimo = { ...emprestimo };
-
-        if (this.isEmprestimoAtrasado(emprestimo)) {
-          tempEmprestimo.status = Status.Atrasado;
-        }
-
-        return tempEmprestimo;
-      });
-
-      const livroAtualizado = {
-        ...livro,
-        emprestimos: emprestimosAtualizados,
-      };
+      const livro: LivroWithEmprestimos | null =
+        await livroService.getLivroById(id);
 
       return response.status(200).json({
         message: "Livro encontrado com sucesso.",
-        livro: livroAtualizado,
+        livro: livro,
       });
     } catch (error) {
       return response.status(400).json({ message: "Erro ao procurar livro." });
@@ -153,29 +76,15 @@ class LivroController implements Crud {
     const { id } = request.params;
 
     try {
-      // Retorna os emprestimos do livro
-      const livro = await prisma.livro.findUnique({
-        where: { id },
-        include: { emprestimos: true },
-      });
+      const { deletedLivro, message } = await livroService.deleteLivro(id);
 
-      if (!livro)
-        return response.status(404).json({ message: "Livro não encontrado." });
-      // Verifica se o livro contem emprestimos ativos
-      const emprestimoAtivo = livro.emprestimos.some((emprestimo) =>
-        this.isEmprestimoAtivo(emprestimo),
-      );
-
-      if (emprestimoAtivo) {
-        return response
-          .status(400)
-          .json({ message: "Livro está emprestado no momento." });
+      if (message === "Livro não encontrado.") {
+        return response.status(404).json({ message });
+      } else if (
+        message === "Não é possível excluir um livro com empréstimos ativos."
+      ) {
+        return response.status(409).json({ message });
       }
-
-      const [, deletedLivro] = await prisma.$transaction([
-        prisma.emprestimo.deleteMany({ where: { livroId: id } }),
-        prisma.livro.delete({ where: { id } }),
-      ]);
 
       return response
         .status(200)
