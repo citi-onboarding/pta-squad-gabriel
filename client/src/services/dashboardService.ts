@@ -1,4 +1,15 @@
 import api from "@/lib/api";
+import type { StatusEmprestimo } from "@/types";
+
+export interface DashboardLatestLoan {
+  id: string;
+  livro_titulo: string;
+  nome_cliente: string;
+  email_cliente: string;
+  status: StatusEmprestimo;
+  data_locacao: string;
+  data_prevista_devolucao: string;
+}
 
 // tipo dos dados que vem da API
 export interface DashboardData {
@@ -11,15 +22,7 @@ export interface DashboardData {
     categoria: string;
     quantidade: number;
   }[];
-  latestLoans: {
-    id: string;
-    livro: string;
-    nome_cliente: string;
-    email_cliente: string;
-    status: string;
-    data_locacao: string;
-    data_prevista_devolucao: string;
-  }[];
+  latestLoans: DashboardLatestLoan[];
 }
 
 // busca os dados do dashboard da API

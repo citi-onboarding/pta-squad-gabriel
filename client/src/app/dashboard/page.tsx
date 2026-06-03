@@ -5,10 +5,23 @@ import CardMetricas from "@/components/CardMetricas";
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
 import GraficoLivros from "@/components/GraficoLivros";
 import { metricasConfig } from "@/config/metricas";
-import { getDashboard, DashboardData } from "@/services/dashboardService";
-import { LivroResumido, Emprestimo } from "@/types";
+import {
+  getDashboard,
+  DashboardData,
+  DashboardLatestLoan,
+} from "@/services/dashboardService";
 import { devolverEmprestimo } from "@/services/emprestimoService";
 import { toast } from "sonner";
+
+type EmprestimoTabela = Pick<
+  DashboardLatestLoan,
+  | "id"
+  | "livro_titulo"
+  | "nome_cliente"
+  | "data_locacao"
+  | "data_prevista_devolucao"
+  | "status"
+>;
 
 export default function DashboardPage() {
   const [dados, setDados] = useState<DashboardData | null>(null);
@@ -29,36 +42,21 @@ export default function DashboardPage() {
     buscar();
   }, []);
 
-  const livrosAdaptados: LivroResumido[] = (dados?.latestLoans ?? []).map(
-    (loan) => ({
-      id: loan.id,
-      titulo: loan.livro,
-      autor: "-",
-      categoria: "Romance",
-      quantidade_total: 0,
-      quantidade_disponivel: 0,
-    }),
-  );
-
   const dadosGrafico = (dados?.booksByCategory ?? []).map((item) => ({
     categoria: item.categoria,
     quantidade: item.quantidade,
   }));
 
-  const emprestimosAdaptados: Record<string, Emprestimo[]> = {};
-  for (const loan of dados?.latestLoans ?? []) {
-    emprestimosAdaptados[loan.id] = [
-      {
-        id: loan.id,
-        livroId: loan.id,
-        nome_cliente: loan.nome_cliente,
-        email_cliente: loan.email_cliente,
-        data_locacao: loan.data_locacao,
-        data_prevista_devolucao: loan.data_prevista_devolucao,
-        status: loan.status as any,
-      },
-    ];
-  }
+  const emprestimosTabela: EmprestimoTabela[] = (dados?.latestLoans ?? []).map(
+    (loan) => ({
+      id: loan.id,
+      livro_titulo: loan.livro_titulo,
+      nome_cliente: loan.nome_cliente,
+      data_locacao: loan.data_locacao,
+      data_prevista_devolucao: loan.data_prevista_devolucao,
+      status: loan.status,
+    }),
+  );
 
   async function handleConfirmarDevolucao(emprestimoId: string) {
     try {
@@ -106,8 +104,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <TabelaEmprestimos
-              livros={livrosAdaptados}
-              emprestimos={emprestimosAdaptados}
+              emprestimos={emprestimosTabela}
               onConfirmarDevolucao={handleConfirmarDevolucao}
             />
           )}

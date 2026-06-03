@@ -1,14 +1,13 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { LivroResumido, Emprestimo, StatusEmprestimo } from "@/types";
+import { StatusEmprestimo } from "@/types";
 import { StatusBadge } from "../StatusBadge";
 import {
   Select,
@@ -33,17 +32,26 @@ import {
 } from "@/components/ui/alert-dialog";
 import { sendEmail } from "@/services/emprestimoService";
 import { toast } from "sonner";
+import type { DashboardLatestLoan } from "@/services/dashboardService";
+
+type EmprestimoTabela = Pick<
+  DashboardLatestLoan,
+  | "id"
+  | "livro_titulo"
+  | "nome_cliente"
+  | "data_locacao"
+  | "data_prevista_devolucao"
+  | "status"
+>;
 
 type TabelaEmprestimoProps = {
-  livros: LivroResumido[];
-  emprestimos: Record<string, Emprestimo[]>;
+  emprestimos: EmprestimoTabela[];
   onConfirmarDevolucao?: (emprestimoId: string) => Promise<void>;
 };
 
 type FilterStatus = StatusEmprestimo | "Todos";
 
 export function TabelaEmprestimos({
-  livros,
   emprestimos,
   onConfirmarDevolucao,
 }: TabelaEmprestimoProps) {
@@ -53,21 +61,15 @@ export function TabelaEmprestimos({
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const livrosMap: Record<string, string> = {};
-  for (const livro of livros) {
-    livrosMap[livro.id] = livro.titulo;
-  }
-
   const formatarData = (data: string) =>
     new Date(data).toLocaleDateString("pt-BR");
 
-  const handleEnviarLembrete = async (emprestimo: Emprestimo) => {
+  const handleEnviarLembrete = async (emprestimo: EmprestimoTabela) => {
     const toastId = toast.loading("Enviando e-mail de lembrete...");
     try {
       await sendEmail(emprestimo.id);
       toast.success("Lembrete enviado com sucesso!", { id: toastId });
-      } 
-      catch (error) {
+    } catch (error) {
       console.error("Erro ao enviar lembrete:", error);
       toast.error("Erro ao enviar o lembrete.", { id: toastId });
     }
@@ -80,11 +82,10 @@ export function TabelaEmprestimos({
     setLoadingId(null);
   };
 
-  const todosEmprestimos: Emprestimo[] = Object.values(emprestimos).flat();
-  const emprestimosFiltrados: Emprestimo[] =
+  const emprestimosFiltrados: EmprestimoTabela[] =
     statusFilter === "Todos" || !statusFilter
-      ? todosEmprestimos
-      : todosEmprestimos.filter((emp) => emp.status === statusFilter);
+      ? emprestimos
+      : emprestimos.filter((emp) => emp.status === statusFilter);
 
   return (
     <div className="border rounded-md bg-white px-5 py-4 space-y-4">
@@ -143,7 +144,7 @@ export function TabelaEmprestimos({
               emprestimosFiltrados.map((emp) => (
                 <TableRow key={emp.id}>
                   <TableCell className="font-medium w-[20%] whitespace-nowrap overflow-hidden text-ellipsis">
-                    {livrosMap[emp.livroId] ?? "Livro não encontrado"}
+                    {emp.livro_titulo}
                   </TableCell>
                   <TableCell className="w-[20%] whitespace-nowrap overflow-hidden text-ellipsis">
                     {emp.nome_cliente}
