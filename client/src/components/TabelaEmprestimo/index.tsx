@@ -50,7 +50,6 @@ export function TabelaEmprestimos({
   );
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [emprestimosState, setEmprestimosState] = useState(emprestimos);
 
   const livrosMap: Record<string, string> = {};
   for (const livro of livros) {
@@ -66,23 +65,14 @@ export function TabelaEmprestimos({
     );
   };
 
-  const handleConfirmarDevolucao = async (
-    emprestimoId: string,
-    livroId: string,
-  ) => {
+  const handleConfirmarDevolucao = async (emprestimoId: string) => {
     setConfirmandoId(null);
     setLoadingId(emprestimoId);
     await onConfirmarDevolucao?.(emprestimoId);
-    setEmprestimosState((prev) => ({
-      ...prev,
-      [livroId]: prev[livroId]?.map((emp) =>
-        emp.id === emprestimoId ? { ...emp, status: "Devolvido" } : emp,
-      ),
-    }));
     setLoadingId(null);
   };
 
-  const todosEmprestimos: Emprestimo[] = Object.values(emprestimosState).flat();
+  const todosEmprestimos: Emprestimo[] = Object.values(emprestimos).flat();
   const emprestimosFiltrados: Emprestimo[] =
     statusFilter === "Todos" || !statusFilter
       ? todosEmprestimos
@@ -218,14 +208,9 @@ export function TabelaEmprestimos({
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-emerald-500 hover:bg-emerald-600"
-              onClick={() => {
-                if (confirmandoId) {
-                  const emp = todosEmprestimos.find(
-                    (emp) => emp.id === confirmandoId,
-                  );
-                  if (emp) handleConfirmarDevolucao(confirmandoId, emp.livroId);
-                }
-              }}
+              onClick={() =>
+                confirmandoId && handleConfirmarDevolucao(confirmandoId)
+              }
             >
               Confirmar
             </AlertDialogAction>
