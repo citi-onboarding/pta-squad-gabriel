@@ -31,6 +31,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { sendEmail } from "@/services/emprestimoService";
+import { toast } from "sonner";
 
 type TabelaEmprestimoProps = {
   livros: LivroResumido[];
@@ -59,10 +61,16 @@ export function TabelaEmprestimos({
   const formatarData = (data: string) =>
     new Date(data).toLocaleDateString("pt-BR");
 
-  const handleEnviarLembrete = (emprestimo: Emprestimo) => {
-    alert(
-      `Lembrete enviado para ${emprestimo.nome_cliente} (${emprestimo.email_cliente})`,
-    );
+  const handleEnviarLembrete = async (emprestimo: Emprestimo) => {
+    const toastId = toast.loading("Enviando e-mail de lembrete...");
+    try {
+      await sendEmail(emprestimo.id);
+      toast.success("Lembrete enviado com sucesso!", { id: toastId });
+      } 
+      catch (error) {
+      console.error("Erro ao enviar lembrete:", error);
+      toast.error("Erro ao enviar o lembrete.", { id: toastId });
+    }
   };
 
   const handleConfirmarDevolucao = async (emprestimoId: string) => {
