@@ -12,6 +12,7 @@
     "generate": "prisma generate",
     "migration": "cross-env DATABASE_HOST='localhost' prisma migrate dev",
     "migration:deploy": "prisma migrate deploy",
+    "seed": "cross-env DATABASE_HOST='localhost' ts-node -r tsconfig-paths/register prisma/seed.ts",
     "studio": "cross-env DATABASE_HOST='localhost' prisma studio"
   },
   "devDependencies": {
