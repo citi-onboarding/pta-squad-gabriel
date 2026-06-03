@@ -85,6 +85,11 @@ export function TabelaEmprestimos({
       ? todosEmprestimos
       : todosEmprestimos.filter((emp) => emp.status === statusFilter);
 
+  const emprestimosParaExibir =
+    statusFilter === "Todos" || !statusFilter
+      ? emprestimosFiltrados.slice(0, 5)
+      : emprestimosFiltrados;
+
   return (
     <div className="border rounded-md bg-white px-5 py-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -129,7 +134,7 @@ export function TabelaEmprestimos({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {emprestimosFiltrados.length === 0 ? (
+            {emprestimosParaExibir.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -139,7 +144,7 @@ export function TabelaEmprestimos({
                 </TableCell>
               </TableRow>
             ) : (
-              emprestimosFiltrados.map((emp) => (
+              emprestimosParaExibir.map((emp) => (
                 <TableRow key={emp.id}>
                   <TableCell className="font-medium w-[20%] whitespace-nowrap overflow-hidden text-ellipsis">
                     {livrosMap[emp.livroId] ?? "Livro não encontrado"}
