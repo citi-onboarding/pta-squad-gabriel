@@ -1,25 +1,7 @@
 import { Request, Response } from "express";
-import { Status } from "@prisma/client";
 import livroService from "../services/livroService";
-import { LivroResponse, LivroWithEmprestimos } from "src/types";
 
 class LivroController {
-  private isEmprestimoAtrasado(emprestimo: any) {
-    const hoje = new Date();
-    const data_prevista = new Date(emprestimo.data_prevista_devolucao);
-    //Verifica se esta atrasado pela data e se nao foi devolvido
-    return hoje > data_prevista && emprestimo.status !== Status.Devolvido;
-  }
-  private isEmprestimoAtivo(emprestimo: any) {
-    if (
-      emprestimo.status === Status.Em_andamento ||
-      this.isEmprestimoAtrasado(emprestimo)
-    )
-      return true;
-
-    return false;
-  }
-
   create = async (request: Request, response: Response) => {
     try {
       const {
@@ -35,7 +17,7 @@ class LivroController {
 
       const quantidade_disponivel = Number(quantidade_total);
 
-      const createdLivro: LivroResponse = await livroService.createLivro({
+      const createdLivro = await livroService.createLivro({
         titulo,
         autor,
         isbn,
@@ -59,8 +41,7 @@ class LivroController {
   get = async (request: Request, response: Response) => {
     try {
       const { titulo, autor, categoria } = request.query;
-
-      const livros: LivroResponse[] = await livroService.getAllLivros({
+      const livros = await livroService.getAllLivros({
         titulo,
         autor,
         categoria,
@@ -76,14 +57,17 @@ class LivroController {
     const { id } = request.params;
 
     try {
-      const livro: LivroWithEmprestimos | null =
-        await livroService.getLivroById(id);
+      const livro = await livroService.getLivroById(id);
 
       return response.status(200).json({
         message: "Livro encontrado com sucesso.",
         livro: livro,
       });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "Livro não encontrado.") {
+        return response.status(404).json({ message: error.message });
+      }
+
       return response.status(400).json({ message: "Erro ao procurar livro." });
     }
   };
@@ -92,20 +76,21 @@ class LivroController {
     const { id } = request.params;
 
     try {
-      const { deletedLivro, message } = await livroService.deleteLivro(id);
-
-      if (message === "Livro não encontrado.") {
-        return response.status(404).json({ message });
-      } else if (
-        message === "Não é possível excluir um livro com empréstimos ativos."
-      ) {
-        return response.status(409).json({ message });
-      }
+      const deletedLivro = await livroService.deleteLivro(id);
 
       return response
         .status(200)
         .json({ message: "Livro deletado com sucesso.", deletedLivro });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "Livro não encontrado.") {
+        return response.status(404).json({ message: error.message });
+      } else if (
+        error.message ===
+        "Não é possível deletar o livro com empréstimos ativos."
+      ) {
+        return response.status(409).json({ message: error.message });
+      }
+
       return response.status(400).json({ message: "Erro ao deletar livro." });
     }
   };

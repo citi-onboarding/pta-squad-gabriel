@@ -20,14 +20,15 @@ class LivroService {
     if (
       emprestimo.status === Status.Em_andamento ||
       this.isEmprestimoAtrasado(emprestimo)
-    )
-      return true;
+    ) { return true; }
 
     return false;
   }
 
   async createLivro(livro: CreateLivroInput): Promise<LivroResponse> {
-    return livroRepository.create(livro);
+    const createdLivro = await livroRepository.create(livro);
+   
+    return createdLivro;
   }
 
   async getAllLivros(filter?: any): Promise<LivroResponse[]> {
@@ -36,12 +37,13 @@ class LivroService {
       autor: filter?.autor ? String(filter.autor) : undefined,
       categoria: filter?.categoria as Categoria | undefined,
     };
-    return livroRepository.findAll(filterParsed);
+    const livros = await livroRepository.findAll(filterParsed);
+    return livros;
   }
 
   async getLivroById(id: string): Promise<LivroWithEmprestimos | null> {
     const livro = await livroRepository.findById(id);
-    if (!livro) return null;
+    if (!livro) throw new Error("Livro não encontrado.");
 
     const emprestimosAtualizados = livro.emprestimos.map(
       (emprestimo: Emprestimo) => {
@@ -64,11 +66,11 @@ class LivroService {
 
   async deleteLivro(
     id: string,
-  ): Promise<{ deletedLivro: LivroResponse | null; message: string }> {
+  ): Promise< LivroResponse > {
     const checkLivro = await livroRepository.findById(id);
 
     if (!checkLivro) {
-      return { deletedLivro: null, message: "Livro não encontrado." };
+      throw new Error("Livro não encontrado.");
     }
 
     const emprestimoAtivo = checkLivro?.emprestimos.some((emprestimo) =>
@@ -76,18 +78,14 @@ class LivroService {
     );
 
     if (emprestimoAtivo) {
-      return {
-        deletedLivro: null,
-        message: "Não é possível excluir um livro com empréstimos ativos.",
-      };
+      throw new Error(
+        "Não é possível deletar o livro com empréstimos ativos.",
+      );
     }
 
     const deletedLivro = await livroRepository.delete(id);
 
-    return {
-      deletedLivro: deletedLivro,
-      message: "Livro deletado com sucesso.",
-    };
+    return deletedLivro
   }
 }
 export default new LivroService();

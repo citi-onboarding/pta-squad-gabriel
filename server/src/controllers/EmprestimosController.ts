@@ -68,7 +68,8 @@ const emprestimoController = {
     try {
       const { id } = req.params;
 
-      await emprestimoService.enviarLembrete(id);
+      const teste = await emprestimoService.enviarLembrete(id);
+      console.log(teste)
 
       return res.status(200).json({ message: "Lembrete enviado com sucesso!" });
     } catch (error: any) {
@@ -81,6 +82,7 @@ const emprestimoController = {
         return res.status(400).json({ message: error.message });
       }
       
+      console.log(error)
       return res.status(500).json({ message: "Erro ao buscar empréstimos." });
     }
   },
