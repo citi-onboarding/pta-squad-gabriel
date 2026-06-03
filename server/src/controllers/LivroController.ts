@@ -1,9 +1,25 @@
 import { Request, Response } from "express";
-import { Crud } from "../global";
+import { Status } from "@prisma/client";
 import livroService from "../services/livroService";
 import { LivroResponse, LivroWithEmprestimos } from "src/types";
 
-class LivroController implements Crud {
+class LivroController {
+  private isEmprestimoAtrasado(emprestimo: any) {
+    const hoje = new Date();
+    const data_prevista = new Date(emprestimo.data_prevista_devolucao);
+    //Verifica se esta atrasado pela data e se nao foi devolvido
+    return hoje > data_prevista && emprestimo.status !== Status.Devolvido;
+  }
+  private isEmprestimoAtivo(emprestimo: any) {
+    if (
+      emprestimo.status === Status.Em_andamento ||
+      this.isEmprestimoAtrasado(emprestimo)
+    )
+      return true;
+
+    return false;
+  }
+
   create = async (request: Request, response: Response) => {
     try {
       const {

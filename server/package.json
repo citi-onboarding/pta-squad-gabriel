@@ -5,13 +5,14 @@
   "license": "MIT",
   "scripts": {
     "push": "cross-env DATABASE_HOST='localhost' prisma db push",
-    "dev": "prisma generate && ts-node-dev --poll --exit-child -r tsconfig-paths/register --respawn --transpile-only --ignore-watch node_modules --no-notify src/server.ts",
+    "dev": "prisma migrate deploy && prisma generate && ts-node-dev --poll --exit-child -r tsconfig-paths/register --respawn --transpile-only --ignore-watch node_modules --no-notify src/server.ts",
     "build": "swc src --extensions \".js,.ts\" --out-dir dist --copy-files",
     "prod": "npm run migration:deploy && npm run start",
     "start": "npm run build && node dist/server.js",
     "generate": "prisma generate",
     "migration": "cross-env DATABASE_HOST='localhost' prisma migrate dev",
     "migration:deploy": "prisma migrate deploy",
+    "seed": "cross-env DATABASE_HOST='localhost' ts-node -r tsconfig-paths/register prisma/seed.ts",
     "studio": "cross-env DATABASE_HOST='localhost' prisma studio"
   },
   "devDependencies": {

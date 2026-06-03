@@ -31,10 +31,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { sendEmail } from "@/services/emprestimoService";
+import { toast } from "sonner";
 
 type TabelaEmprestimoProps = {
   livros: LivroResumido[];
   emprestimos: Record<string, Emprestimo[]>;
+  onConfirmarDevolucao?: (emprestimoId: string) => Promise<void>;
 };
 
 type FilterStatus = StatusEmprestimo | "Todos";
@@ -42,13 +45,13 @@ type FilterStatus = StatusEmprestimo | "Todos";
 export function TabelaEmprestimos({
   livros,
   emprestimos,
+  onConfirmarDevolucao,
 }: TabelaEmprestimoProps) {
   const [statusFilter, setStatusFilter] = useState<FilterStatus | undefined>(
     undefined,
   );
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [emprestimosState, setEmprestimosState] = useState(emprestimos);
 
   const livrosMap: Record<string, string> = {};
   for (const livro of livros) {
@@ -58,28 +61,26 @@ export function TabelaEmprestimos({
   const formatarData = (data: string) =>
     new Date(data).toLocaleDateString("pt-BR");
 
-  const handleEnviarLembrete = (emprestimo: Emprestimo) => {
-    alert(
-      `Lembrete enviado para ${emprestimo.nome_cliente} (${emprestimo.email_cliente})`,
-    );
+  const handleEnviarLembrete = async (emprestimo: Emprestimo) => {
+    const toastId = toast.loading("Enviando e-mail de lembrete...");
+    try {
+      await sendEmail(emprestimo.id);
+      toast.success("Lembrete enviado com sucesso!", { id: toastId });
+      } 
+      catch (error) {
+      console.error("Erro ao enviar lembrete:", error);
+      toast.error("Erro ao enviar o lembrete.", { id: toastId });
+    }
   };
 
-  const handleConfirmarDevolucao = async (
-    emprestimoId: string,
-    livroId: string,
-  ) => {
+  const handleConfirmarDevolucao = async (emprestimoId: string) => {
     setConfirmandoId(null);
     setLoadingId(emprestimoId);
-    setEmprestimosState((prev) => ({
-      ...prev,
-      [livroId]: prev[livroId]?.map((emp) =>
-        emp.id === emprestimoId ? { ...emp, status: "Devolvido" } : emp,
-      ),
-    }));
+    await onConfirmarDevolucao?.(emprestimoId);
     setLoadingId(null);
   };
 
-  const todosEmprestimos: Emprestimo[] = Object.values(emprestimosState).flat();
+  const todosEmprestimos: Emprestimo[] = Object.values(emprestimos).flat();
   const emprestimosFiltrados: Emprestimo[] =
     statusFilter === "Todos" || !statusFilter
       ? todosEmprestimos
@@ -215,14 +216,9 @@ export function TabelaEmprestimos({
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-emerald-500 hover:bg-emerald-600"
-              onClick={() => {
-                if (confirmandoId) {
-                  const emp = todosEmprestimos.find(
-                    (emp) => emp.id === confirmandoId,
-                  );
-                  if (emp) handleConfirmarDevolucao(confirmandoId, emp.livroId);
-                }
-              }}
+              onClick={() =>
+                confirmandoId && handleConfirmarDevolucao(confirmandoId)
+              }
             >
               Confirmar
             </AlertDialogAction>

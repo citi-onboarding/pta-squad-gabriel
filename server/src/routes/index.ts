@@ -2,7 +2,7 @@
 import { Router } from "express";
 import LivroRoutes from "./LivroRoutes";
 import emprestimoRoutes from "./EmprestimoRoutes";
-import dashboardRoutes from "./dashboardRoutes";;
+import dashboardRoutes from "./DashboardRoutes";
 
 const router = Router();
 

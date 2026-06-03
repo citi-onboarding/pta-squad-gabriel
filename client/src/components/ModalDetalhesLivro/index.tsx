@@ -34,6 +34,9 @@ import infantilImg from "../../../../assets/categoriasCard/infantil.png";
 // tipagem
 import { Categoria, Livro, Emprestimo, StatusEmprestimo } from "@/types/index";
 
+import { sendEmail } from "@/services/emprestimoService";
+import { toast } from "sonner";
+
 // mapa de categorias para imagens
 const imagensCategorias: Record<Categoria, any> = {
   Romance: romanceImg,
@@ -88,10 +91,16 @@ export function ModalDetalhesLivro({
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const handleEnviarLembrete = (emprestimo: Emprestimo) => {
-    alert(
-      `Lembrete enviado para ${emprestimo.nome_cliente} (${emprestimo.email_cliente})`,
-    );
+  const handleEnviarLembrete = async (emprestimo: Emprestimo) => {
+    const toastId = toast.loading("Enviando e-mail de lembrete...");
+    try {
+      await sendEmail(emprestimo.id);
+      toast.success("Lembrete enviado com sucesso!", { id: toastId });
+      } 
+      catch (error) {
+      console.error("Erro ao enviar lembrete:", error);
+      toast.error("Erro ao enviar o lembrete.", { id: toastId });
+    }
   };
 
   const handleConfirmarDevolucao = async (emprestimo: Emprestimo) => {

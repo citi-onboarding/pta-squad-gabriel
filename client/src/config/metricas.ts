@@ -1,28 +1,24 @@
-import { Cores } from "@/types";
 import { BookOpen, AlertCircle, Clock, LucideIcon } from "lucide-react";
+import { Cores } from "@/types";
 
-type StatItem = {
-  valor: number;
+type MetricaConfig = {
   descricao: string;
   Icon: LucideIcon;
   cor: Cores;
 };
 
-export const mockStats: Record<string, StatItem> = {
-  totalLivros: {
-    valor: 1247,
+export const metricasConfig: Record<string, MetricaConfig> = {
+  totalBooks: {
     descricao: "Total de Livros",
     Icon: BookOpen,
     cor: "green",
   },
-  emprestimosAtivos: {
-    valor: 43,
+  activeLoans: {
     descricao: "Empréstimos Ativos",
     Icon: Clock,
     cor: "green",
   },
-  livrosAtraso: {
-    valor: 12,
+  overdueLoans: {
     descricao: "Livros Atrasados",
     Icon: AlertCircle,
     cor: "red",
