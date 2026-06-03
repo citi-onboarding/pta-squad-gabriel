@@ -77,7 +77,10 @@ const emprestimoController = {
         error.message === "Livro não encontrado."
       ) {
         return res.status(404).json({ message: error.message });
+      } else if (error.message === "Empréstimo não está atrasado.") {
+        return res.status(400).json({ message: error.message });
       }
+      
       return res.status(500).json({ message: "Erro ao buscar empréstimos." });
     }
   },
