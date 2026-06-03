@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 // componentes
 import BarraDeBuscar from "@/components/BarraDeBusca";
-import Card from "@/components/card";
+import Card from "@/components/Card";
 import { ModalDetalhesLivro } from "@/components/ModalDetalhesLivro";
 import { ModalEmprestimo } from "@/components/ModalEmprestimo";
 import api from "@/lib/api";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CardMetricas from "@/components/cardMetricas";
+import CardMetricas from "@/components/CardMetricas";
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
 import GraficoLivros from "@/components/GraficoLivros";
 import { mockStats } from "@/mocks/cards";
