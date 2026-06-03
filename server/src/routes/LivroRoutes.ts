@@ -1,7 +1,7 @@
 import { Router } from "express";
 import LivroController from "../controllers/LivroController";
 import { validate } from "../middlewares/validate";
-import { createLivroSchema } from "../dtos/livroDTO";
+import { createLivroSchema } from "../DTOs/livroDTO";
 
 const router = Router();
 

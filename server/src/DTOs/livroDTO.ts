@@ -8,7 +8,7 @@ export const createLivroSchema = z.object({
   ano: z.number({ required_error: "Ano é obrigatório." }),
   quantidade_total: z.number({ required_error: "Quantidade total é obrigatória." }),
   categoria: z.string().min(1, "Categoria é obrigatória."),
-  foto_url: z.string().url("URL da foto inválida.").optional(),
+  foto_url: z.string().url("URL da foto inválida.").or(z.literal("")).optional(),
 });
 
 export type CreateLivroDTO = z.infer<typeof createLivroSchema>;
