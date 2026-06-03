@@ -31,26 +31,7 @@ class LivroController {
         categoria,
         foto_url,
       } = request.body;
-      //Valida campos obrigatorios
-      if (
-        !titulo ||
-        !autor ||
-        !isbn ||
-        !editora ||
-        ano === undefined ||
-        quantidade_total === undefined ||
-        !categoria
-      ) {
-        return response
-          .status(400)
-          .json({ message: "Todos os campos são obrigatórios." });
-      }
-      //Valida ISBN
-      const isbn_regex = /^(?:\d{10}|\d{13})$/;
-      if (typeof isbn !== "string" || !isbn_regex.test(isbn)) {
-        return response.status(400).json({ message: "ISBN inválido." });
-      }
-
+    
       const quantidade_disponivel = quantidade_total;
 
       const createdLivro = await prisma.livro.create({

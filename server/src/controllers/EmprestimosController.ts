@@ -15,24 +15,6 @@ const emprestimoController = {
       } = req.body;
 
       // POST /emprestimos
-      // Checa os campos obrigatórios
-      if (
-        !livroId ||
-        !nome_cliente ||
-        !email_cliente ||
-        !data_locacao ||
-        !data_prevista_devolucao
-      ) {
-        return res
-          .status(400)
-          .json({ error: "Todos os campos são obrigatórios." });
-      }
-
-      // checa o email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email_cliente)) {
-        return res.status(400).json({ error: "Email inválido." });
-      }
 
       const locacao = new Date(data_locacao);
       const devolucao = new Date(data_prevista_devolucao);
