@@ -88,7 +88,7 @@ export function TabelaEmprestimos({
 
   return (
     <div className="border rounded-md bg-white px-5 py-4 space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold text-gray-800">
           Últimos Empréstimos
         </h2>
@@ -96,7 +96,7 @@ export function TabelaEmprestimos({
           value={statusFilter}
           onValueChange={(value) => setStatusFilter(value as FilterStatus)}
         >
-          <SelectTrigger className="w-[180px] rounded-xl">
+          <SelectTrigger className="w-full rounded-xl sm:w-[180px]">
             <SelectValue placeholder="Filtrar por status" />
           </SelectTrigger>
           <SelectContent>
@@ -108,8 +108,8 @@ export function TabelaEmprestimos({
         </Select>
       </div>
 
-      <div className="rounded-md border">
-        <Table className="table-fixed w-full">
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[760px] table-fixed w-full">
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="font-semibold w-[20%] whitespace-nowrap overflow-hidden text-slate-950 text-ellipsis">
@@ -155,11 +155,11 @@ export function TabelaEmprestimos({
                     {formatarData(emp.data_prevista_devolucao)}
                   </TableCell>
                   <TableCell className="w-[30%]">
-                    <div className="grid w-full grid-cols-1 gap-0.5 sm:grid-cols-[auto_auto] sm:items-center sm:min-h-8">
+                    <div className="flex items-center gap-2 justify-start min-h-8">
                       <div className="shrink-0 flex items-center justify-start">
                         <StatusBadge status={emp.status} />
                       </div>
-                      <div className="flex items-center gap-0.5 justify-center sm:justify-start h-8 min-w-0">
+                      <div className="flex items-center gap-0.5 justify-start h-8 min-w-0">
                         {emp.status === "Em_andamento" && (
                           <Button
                             size="sm"

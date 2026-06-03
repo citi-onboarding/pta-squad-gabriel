@@ -73,15 +73,24 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <main className="max-w-6xl mx-auto py-8 px-4">
+      <main className="max-w-6xl mx-auto w-full min-w-0 py-8 px-4 overflow-x-hidden">
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
         <p className="text-gray-500 text-sm mt-1">Visão geral da biblioteca</p>
 
         {/* Cards de métricas */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <CardMetricas valor={dados?.metrics.totalBooks ?? 0} {...metricasConfig.totalBooks} />
-          <CardMetricas valor={dados?.metrics.activeLoans ?? 0} {...metricasConfig.activeLoans} />
-          <CardMetricas valor={dados?.metrics.overdueLoans ?? 0} {...metricasConfig.overdueLoans} />
+          <CardMetricas
+            valor={dados?.metrics.totalBooks ?? 0}
+            {...metricasConfig.totalBooks}
+          />
+          <CardMetricas
+            valor={dados?.metrics.activeLoans ?? 0}
+            {...metricasConfig.activeLoans}
+          />
+          <CardMetricas
+            valor={dados?.metrics.overdueLoans ?? 0}
+            {...metricasConfig.overdueLoans}
+          />
         </div>
 
         {/* Gráfico de livros por categoria */}
