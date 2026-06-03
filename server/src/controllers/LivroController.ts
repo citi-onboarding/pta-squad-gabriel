@@ -64,19 +64,12 @@ class LivroController implements Crud {
 
       const where: any = {};
 
-      if (titulo) {
-        where.titulo = {
-          contains: String(titulo),
-          mode: "insensitive",
-        };
-      }
-
-      if (autor) {
-        where.autor = {
-          contains: String(autor),
-          mode: "insensitive",
-        };
-      }
+      if (titulo || autor) {
+      where.OR = [
+        titulo ? { titulo: { contains: String(titulo), mode: "insensitive" } } : undefined,
+        autor ? { autor: { contains: String(autor), mode: "insensitive" } } : undefined,
+      ].filter(Boolean);
+    }
 
       if (categoria) {
         where.categoria = categoria;
