@@ -64,6 +64,8 @@ export default function DashboardPage() {
     try {
       await devolverEmprestimo(emprestimoId);
       toast.success("Livro devolvido com sucesso!");
+      const data = await getDashboard();
+      setDados(data);
     } catch (error) {
       toast.error("Erro ao processar devolução. Tente novamente.");
     }
