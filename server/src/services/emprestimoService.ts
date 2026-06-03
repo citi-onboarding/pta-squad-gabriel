@@ -3,6 +3,13 @@ import emprestimoRepository from "../repositories/emprestimoRepository";
 import { enviarLembrete } from "./emailService";
 
 class EmprestimoService {
+  private isEmprestimoAtrasado(emprestimo: any) {
+    const hoje = new Date();
+    const data_prevista = new Date(emprestimo.data_prevista_devolucao);
+    //Verifica se esta atrasado pela data e se nao foi devolvido
+    return hoje > data_prevista && emprestimo.status !== Status.Devolvido;
+  }
+
   private async getEmprestimoOrThrow(id: string) {
     const emprestimo = await emprestimoRepository.findById(id);
     if (!emprestimo) {
@@ -56,10 +63,13 @@ class EmprestimoService {
   async enviarLembrete(emprestimoId: string): Promise<void> {
     const emprestimo =
       await emprestimoRepository.getEmprestimoWithLivro(emprestimoId);
+
     if (!emprestimo) {
       throw new Error("Empréstimo não encontrado.");
     } else if (!emprestimo.livro) {
       throw new Error("Livro não encontrado.");
+    } else if (!this.isEmprestimoAtrasado(emprestimo)) {
+      throw new Error("Empréstimo não está atrasado."); //Se o empréstimo não estiver atrasado, não envia o lembrete
     }
     //Email service para enviar o lembrete de devolução
     await enviarLembrete({
