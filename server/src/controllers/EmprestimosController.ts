@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Status } from "@prisma/client";
-import prisma from "@database";
-import { enviarLembrete } from "../services/emailService";
+import emprestimoService from "src/services/emprestimoService";
 
 const emprestimoController = {
   async create(req: Request, res: Response) {
@@ -14,67 +13,31 @@ const emprestimoController = {
         data_prevista_devolucao,
       } = req.body;
 
-      // POST /emprestimos
-      // Checa os campos obrigatórios
-      if (
-        !livroId ||
-        !nome_cliente ||
-        !email_cliente ||
-        !data_locacao ||
-        !data_prevista_devolucao
-      ) {
-        return res
-          .status(400)
-          .json({ error: "Todos os campos são obrigatórios." });
-      }
-
-      // checa o email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email_cliente)) {
-        return res.status(400).json({ error: "Email inválido." });
-      }
-
-      const locacao = new Date(data_locacao);
-      const devolucao = new Date(data_prevista_devolucao);
-
-      // Checa se a data de devolução é anterior à data de locação
-      if (devolucao < locacao) {
-        return res.status(400).json({
-          error: "Data de devolução não pode ser anterior à data de locação.",
-        });
-      }
-
-      // Checa se o Livro existe e se há algum dele disponível
-      const livro = await prisma.livro.findUnique({ where: { id: livroId } });
-      if (!livro) {
-        return res.status(404).json({ error: "Livro não encontrado." });
-      }
-      if (livro.quantidade_disponivel <= 0) {
-        return res
-          .status(400)
-          .json({ error: "Não há exemplares disponíveis para empréstimo." });
-      }
-
-      // cria o emprestimo e decrementa a quantidade disponível do livro
-      const [emprestimo] = await prisma.$transaction([
-        prisma.emprestimo.create({
-          data: {
-            livroId,
-            nome_cliente,
-            email_cliente,
-            data_locacao: locacao,
-            data_prevista_devolucao: devolucao,
-          },
-        }),
-        prisma.livro.update({
-          where: { id: livroId },
-          data: { quantidade_disponivel: { decrement: 1 } },
-        }),
-      ]);
+      const emprestimo = await emprestimoService.create({
+        livroId,
+        nome_cliente,
+        email_cliente,
+        data_locacao: data_locacao ? new Date(data_locacao) : new Date(),
+        data_prevista_devolucao: new Date(data_prevista_devolucao),
+        status: Status.Em_andamento,
+      });
 
       return res.status(201).json(emprestimo);
-    } catch (error) {
-      return res.status(500).json({ error: "Erro ao criar empréstimo." });
+    } catch (error: any) {
+      if (error.message === "Livro não encontrado.") {
+        return res.status(404).json({ message: error.message });
+      } else if (
+        error.message === "Não há exemplares disponíveis para empréstimo."
+      ) {
+        return res.status(400).json({ message: error.message });
+      } else if (
+        error.message ===
+        "Data de devolução não pode ser anterior à data de locação."
+      ) {
+        return res.status(400).json({ message: error.message });
+      } else {
+        return res.status(500).json({ message: "Erro ao criar empréstimo." });
+      }
     }
   },
 
@@ -84,59 +47,38 @@ const emprestimoController = {
     try {
       const { id } = req.params;
 
-      const emprestimo = await prisma.emprestimo.findUnique({ where: { id } });
-      if (!emprestimo) {
-        return res.status(404).json({ error: "Empréstimo não encontrado." });
-      }
-      if (emprestimo.status === Status.Devolvido) {
-        return res.status(400).json({ error: "Empréstimo já foi devolvido." });
-      }
+      const emprestimoDevolvido = await emprestimoService.devolver(id);
 
-      // atualizar status e incrementar quantidade disponivel
-      const [emprestimoAtualizado] = await prisma.$transaction([
-        prisma.emprestimo.update({
-          where: { id },
-          data: { status: Status.Devolvido },
-        }),
-        prisma.livro.update({
-          where: { id: emprestimo.livroId },
-          data: { quantidade_disponivel: { increment: 1 } },
-        }),
-      ]);
-
-      return res.status(200).json(emprestimoAtualizado);
-    } catch (error) {
-      return res.status(500).json({ error: "Erro ao devolver empréstimo." });
+      return res.status(200).json(emprestimoDevolvido);
+    } catch (error: any) {
+      if (error.message === "Empréstimo não encontrado.") {
+        return res.status(404).json({ message: error.message });
+      } else if (error.message === "Empréstimo já foi devolvido.") {
+        return res.status(400).json({ message: error.message });
+      } else {
+        return res
+          .status(500)
+          .json({ message: "Erro ao devolver empréstimo." });
+      }
     }
   },
 
   // POST /emprestimos/:id/lembrete
-  // Placeholder
   async lembrete(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      const emprestimo = await prisma.emprestimo.findUnique({
-        where: { id },
-        include: { livro: true }, //incluir dados do livro
-      });
-
-      if (!emprestimo) {
-        return res.status(404).json({ error: "Empréstimo não encontrado." });
-      }
-
-      // Chama o serviço de email passando os dados necessários
-      await enviarLembrete({
-        email_cliente: emprestimo.email_cliente,
-        nome_cliente: emprestimo.nome_cliente,
-        nome_livro: emprestimo.livro.titulo,
-        data_locacao: emprestimo.data_locacao,
-        data_prevista_devolucao: emprestimo.data_prevista_devolucao,
-      });
+      await emprestimoService.enviarLembrete(id);
 
       return res.status(200).json({ message: "Lembrete enviado com sucesso!" });
-    } catch (error) {
-      return res.status(500).json({ error: "Erro ao enviar lembrete." });
+    } catch (error: any) {
+      if (
+        error.message === "Empréstimo não encontrado." ||
+        error.message === "Livro não encontrado."
+      ) {
+        return res.status(404).json({ message: error.message });
+      }
+      return res.status(500).json({ message: "Erro ao buscar empréstimos." });
     }
   },
 
@@ -145,32 +87,13 @@ const emprestimoController = {
   async get(req: Request, res: Response) {
     try {
       const { cliente } = req.query;
-
-      const emprestimos = await prisma.emprestimo.findMany({
-        where: cliente
-          ? {
-              nome_cliente: {
-                contains: String(cliente),
-                mode: "insensitive", // busca case-insensitive
-              },
-            }
-          : undefined,
-        include: { livro: true },
-      });
-
-      //calcular status Atrasado de acordo com a data do dia
-      const hoje = new Date();
-      const resultado = emprestimos.map((e) => ({
-        ...e,
-        status:
-          e.status !== Status.Devolvido && e.data_prevista_devolucao < hoje
-            ? "Atrasado"
-            : e.status,
-      }));
+      const resultado = await emprestimoService.getEmprestimosByCliente(
+        cliente as string,
+      );
 
       return res.status(200).json(resultado);
-    } catch (error) {
-      return res.status(500).json({ error: "Erro ao buscar empréstimos." });
+    } catch (error: any) {
+      return res.status(500).json({ message: "Erro ao buscar empréstimos." });
     }
   },
 };
