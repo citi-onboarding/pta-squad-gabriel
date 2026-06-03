@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import CardMetricas from "@/components/CardMetricas";
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
 import GraficoLivros from "@/components/GraficoLivros";
-import { mockStats } from "@/mocks/cards";
+import { metricasConfig } from "@/config/metricas";
 import { getDashboard, DashboardData } from "@/services/dashboardService";
 import { LivroResumido, Emprestimo } from "@/types";
 import { devolverEmprestimo } from "@/services/emprestimoService";
@@ -79,24 +79,9 @@ export default function DashboardPage() {
 
         {/* Cards de métricas */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <CardMetricas
-            valor={dados?.metrics.totalBooks ?? 0}
-            descricao={mockStats.totalLivros.descricao}
-            Icon={mockStats.totalLivros.Icon}
-            cor={mockStats.totalLivros.cor}
-          />
-          <CardMetricas
-            valor={dados?.metrics.activeLoans ?? 0}
-            descricao={mockStats.emprestimosAtivos.descricao}
-            Icon={mockStats.emprestimosAtivos.Icon}
-            cor={mockStats.emprestimosAtivos.cor}
-          />
-          <CardMetricas
-            valor={dados?.metrics.overdueLoans ?? 0}
-            descricao={mockStats.livrosAtraso.descricao}
-            Icon={mockStats.livrosAtraso.Icon}
-            cor={mockStats.livrosAtraso.cor}
-          />
+          <CardMetricas valor={dados?.metrics.totalBooks ?? 0} {...metricasConfig.totalBooks} />
+          <CardMetricas valor={dados?.metrics.activeLoans ?? 0} {...metricasConfig.activeLoans} />
+          <CardMetricas valor={dados?.metrics.overdueLoans ?? 0} {...metricasConfig.overdueLoans} />
         </div>
 
         {/* Gráfico de livros por categoria */}
