@@ -90,9 +90,9 @@ const emprestimoController = {
   // Busca parcial e case-insensitive por nome do cliente
   async get(req: Request, res: Response) {
     try {
-      const { cliente } = req.query;
+      const { busca } = req.query;
       const resultado = await emprestimoService.getEmprestimosByCliente(
-        cliente as string,
+        busca as string,
       );
 
       return res.status(200).json(resultado);
