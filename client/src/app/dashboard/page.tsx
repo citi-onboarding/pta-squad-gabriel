@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CardMetricas from "@/components/cardMetricas";
+import CardMetricas from "@/components/CardMetricas";
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
 import GraficoLivros from "@/components/GraficoLivros";
-import { mockStats } from "@/mocks/cards";
+import { metricasConfig } from "@/config/metricas";
 import { getDashboard, DashboardData } from "@/services/dashboardService";
 import { LivroResumido, Emprestimo } from "@/types";
+import { devolverEmprestimo } from "@/services/emprestimoService";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
   const [dados, setDados] = useState<DashboardData | null>(null);
@@ -58,6 +60,17 @@ export default function DashboardPage() {
     ];
   }
 
+  async function handleConfirmarDevolucao(emprestimoId: string) {
+    try {
+      await devolverEmprestimo(emprestimoId);
+      toast.success("Livro devolvido com sucesso!");
+      const data = await getDashboard();
+      setDados(data);
+    } catch (error) {
+      toast.error("Erro ao processar devolução. Tente novamente.");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="max-w-6xl mx-auto py-8 px-4">
@@ -66,24 +79,9 @@ export default function DashboardPage() {
 
         {/* Cards de métricas */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <CardMetricas
-            valor={dados?.metrics.totalBooks ?? 0}
-            descricao={mockStats.totalLivros.descricao}
-            Icon={mockStats.totalLivros.Icon}
-            cor={mockStats.totalLivros.cor}
-          />
-          <CardMetricas
-            valor={dados?.metrics.activeLoans ?? 0}
-            descricao={mockStats.emprestimosAtivos.descricao}
-            Icon={mockStats.emprestimosAtivos.Icon}
-            cor={mockStats.emprestimosAtivos.cor}
-          />
-          <CardMetricas
-            valor={dados?.metrics.overdueLoans ?? 0}
-            descricao={mockStats.livrosAtraso.descricao}
-            Icon={mockStats.livrosAtraso.Icon}
-            cor={mockStats.livrosAtraso.cor}
-          />
+          <CardMetricas valor={dados?.metrics.totalBooks ?? 0} {...metricasConfig.totalBooks} />
+          <CardMetricas valor={dados?.metrics.activeLoans ?? 0} {...metricasConfig.activeLoans} />
+          <CardMetricas valor={dados?.metrics.overdueLoans ?? 0} {...metricasConfig.overdueLoans} />
         </div>
 
         {/* Gráfico de livros por categoria */}
@@ -110,6 +108,7 @@ export default function DashboardPage() {
             <TabelaEmprestimos
               livros={livrosAdaptados}
               emprestimos={emprestimosAdaptados}
+              onConfirmarDevolucao={handleConfirmarDevolucao}
             />
           )}
         </div>

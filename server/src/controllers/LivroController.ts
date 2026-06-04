@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import { Crud } from "../global";
 import prisma from "@database";
 import { Status } from "@prisma/client";
 
-class LivroController implements Crud {
+class LivroController {
   private isEmprestimoAtrasado(emprestimo: any) {
     const hoje = new Date();
     const data_prevista = new Date(emprestimo.data_prevista_devolucao);
