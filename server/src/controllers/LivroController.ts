@@ -60,17 +60,15 @@ class LivroController implements Crud {
 
   get = async (request: Request, response: Response) => {
     try {
-      const { titulo, autor, categoria } = request.query;
+      const { busca, categoria } = request.query;
 
-      const where: any = {};
-
-      if (titulo || autor) {
-      where.OR = [
-        titulo ? { titulo: { contains: String(titulo), mode: "insensitive" } } : undefined,
-        autor ? { autor: { contains: String(autor), mode: "insensitive" } } : undefined,
-      ].filter(Boolean);
-    }
-
+      if (busca) {
+        where.OR = [
+          { titulo: { contains: String(busca), mode: "insensitive" } },
+          { autor: { contains: String(busca), mode: "insensitive" } },
+        ];
+      }
+      
       if (categoria) {
         where.categoria = categoria;
       }
