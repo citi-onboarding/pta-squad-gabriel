@@ -15,15 +15,14 @@ interface BarraDeBuscaProps {
 
 export default function BarraDeBusca({ onBuscar }: BarraDeBuscaProps) {
   const [busca, setBusca] = useState("");
-  const [error, setError] = useState("");
 
   const handleBuscar = async () => {
-    if (busca.trim() === "") {
-      setError("Por favor, preencha o campo de busca");
+    const termoBusca = busca.trim();
+
+    if (termoBusca === "") {
       return;
     }
-    setError("");
-    await onBuscar(busca);
+    await onBuscar(termoBusca);
   };
 
   return (
@@ -38,8 +37,6 @@ export default function BarraDeBusca({ onBuscar }: BarraDeBuscaProps) {
           placeholderTextColor="#94a3b8"
         />
       </View>
-
-      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity onPress={handleBuscar} style={styles.botao}>
         <Text style={styles.botaoTexto}>Buscar</Text>
