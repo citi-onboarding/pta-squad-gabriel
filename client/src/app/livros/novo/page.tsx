@@ -14,7 +14,7 @@ export default function NovoLivro() {
       toast.success("Cadastrado com sucesso");
       router.push("/livros");
     } catch (error: any) {
-      toast.error(error.message || "Tente novamente.");
+      toast.error(error.response?.data?.message || "Tente novamente.");
     }
   }
 
