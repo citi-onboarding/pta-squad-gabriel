@@ -59,24 +59,15 @@ class LivroController {
 
   get = async (request: Request, response: Response) => {
     try {
-      const { titulo, autor, categoria } = request.query;
+      const { busca, categoria } = request.query;
 
-      const where: any = {};
-
-      if (titulo) {
-        where.titulo = {
-          contains: String(titulo),
-          mode: "insensitive",
-        };
+      if (busca) {
+        where.OR = [
+          { titulo: { contains: String(busca), mode: "insensitive" } },
+          { autor: { contains: String(busca), mode: "insensitive" } },
+        ];
       }
-
-      if (autor) {
-        where.autor = {
-          contains: String(autor),
-          mode: "insensitive",
-        };
-      }
-
+      
       if (categoria) {
         where.categoria = categoria;
       }

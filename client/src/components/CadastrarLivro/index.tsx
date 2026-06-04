@@ -87,10 +87,10 @@ export default function CadastrarLivro({
 
   function validar() {
     const novosErros = {
-      titulo: form.titulo === "",
-      autor: form.autor === "",
+      titulo: form.titulo.trim().length < 3 || !/^[a-zA-ZÀ-ÿ0-9\s.,!?'"()-]+$/.test(form.titulo.trim()),
+      autor: form.autor.trim().length < 3 || !/^[a-zA-ZÀ-ÿ\s.]+$/.test(form.autor.trim()),
       isbn: !/^\d{10}$|^\d{13}$/.test(form.isbn),
-      editora: form.editora === "",
+      editora: form.editora.trim().length < 2,
       ano:
         form.ano === "" ||
         Number(form.ano) < 1000 ||
@@ -100,7 +100,7 @@ export default function CadastrarLivro({
         Number(form.quantidade_total) < 1 ||
         isNaN(Number(form.quantidade_total)),
       categoria: form.categoria === "",
-      foto_url: false,
+      foto_url: form.foto_url.trim() !== "" && !/^https?:\/\/.+/.test(form.foto_url.trim()),
     };
 
     setErros(novosErros);
@@ -161,6 +161,7 @@ export default function CadastrarLivro({
       setSubmitting(false);
     }
   }
+
   //Função para limpar o formulário
   function handleCancelar() {
     onCancelar();
@@ -223,7 +224,7 @@ export default function CadastrarLivro({
                   erros.titulo ? "visible" : "invisible"
                 }`}
               >
-                *Este campo é obrigatório
+                *Título deve ter pelo menos 3 caracteres e não conter caracteres especiais
               </p>
             </div>
 
@@ -242,7 +243,7 @@ export default function CadastrarLivro({
                   erros.autor ? "visible" : "invisible"
                 }`}
               >
-                *Este campo é obrigatório
+                *Autor deve ter pelo menos 3 caracteres e conter apenas letras
               </p>
             </div>
 
@@ -282,7 +283,7 @@ export default function CadastrarLivro({
                   erros.editora ? "visible" : "invisible"
                 }`}
               >
-                *Este campo é obrigatório
+                *Editora deve ter pelo menos 2 caracteres
               </p>
             </div>
 

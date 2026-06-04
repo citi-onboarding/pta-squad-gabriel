@@ -41,6 +41,14 @@ const imagensCategorias: Record<Categoria, any> = {
   Infantil: infantilImg,
 };
 
+const labelsCategorias: Record<Categoria, string> = {
+  Romance: "Romance",
+  Tecnologia: "Tecnologia",
+  Historia: "História",
+  Ciencias: "Ciências",
+  Infantil: "Infantil",
+};
+
 // componente do card
 export default function Card({
   livro,
@@ -111,7 +119,7 @@ export default function Card({
         <div className="p-4">
           <h2 className="text-base font-semibold text-gray-800">{titulo}</h2>
           <p className="text-sm text-gray-500 mt-1">{autor}</p>
-          <p className="text-sm text-emerald-500 mt-1">{categoria}</p>
+          <p className="text-sm text-emerald-500 mt-1">{labelsCategorias[categoria] ?? categoria}</p>
           <p className="text-sm text-gray-500 mt-1">
             Disponível: {quantidade_disponivel} unidade(s)
           </p>
