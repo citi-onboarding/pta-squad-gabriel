@@ -51,7 +51,7 @@ export default function GraficoLivros({ dados }: GraficoLivrosProps) {
         <XAxis dataKey="categoria" 
         tickFormatter={(value) => nomesCategorias[value] || value} />
 
-        <YAxis />
+        <YAxis allowDecimals={false} />
 
         <Tooltip
           formatter={(value) => [value, "Quantidade"]}
