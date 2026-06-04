@@ -38,7 +38,7 @@ export function ModalEmprestimo({
   const [formData, setFormData] = useState({
     nome_cliente: "",
     email_cliente: "",
-    data_locacao: new Date().toISOString().split("T")[0], //Data de hoje("2026-05-18T14:30:00.000Z") --> ["2026-05-18", "14:30:00.000Z"] --> "2026-05-18"
+    data_locacao: new Date().toISOString().split("T")[0],
     data_prevista_devolucao: "",
   });
   const [errors, setErrors] = useState({
@@ -59,11 +59,19 @@ export function ModalEmprestimo({
     };
     let isValid = true;
 
+    // validar o nome — obrigatório, mínimo de 3 caracteres, só letras e espaços
     if (!formData.nome_cliente.trim()) {
       newErrors.nome_cliente = "Nome é obrigatório";
       isValid = false;
+    } else if (formData.nome_cliente.trim().length < 3) {
+      newErrors.nome_cliente = "Nome deve ter pelo menos 3 caracteres";
+      isValid = false;
+    } else if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(formData.nome_cliente.trim())) {
+      newErrors.nome_cliente = "Nome deve conter apenas letras";
+      isValid = false;
     }
 
+    // validar o email — obrigatório e formato válido 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!formData.email_cliente.trim()) {
       newErrors.email_cliente = "Email é obrigatório";
@@ -73,8 +81,13 @@ export function ModalEmprestimo({
       isValid = false;
     }
 
+    // validar se a data de locação existe e não é no passado, e se a data de devolução existe e é após a data de locação
+    const hoje = new Date().toISOString().split("T")[0];
     if (!formData.data_locacao) {
       newErrors.data_locacao = "Obrigatório";
+      isValid = false;
+    } else if (formData.data_locacao < hoje) {
+      newErrors.data_locacao = "Data de locação não pode ser no passado";
       isValid = false;
     }
 
@@ -82,8 +95,7 @@ export function ModalEmprestimo({
       newErrors.data_prevista_devolucao = "Obrigatório";
       isValid = false;
     } else if (formData.data_prevista_devolucao < formData.data_locacao) {
-      newErrors.data_prevista_devolucao =
-        "Data deve ser após a data de locação";
+      newErrors.data_prevista_devolucao = "Data deve ser após a data de locação";
       isValid = false;
     }
 
@@ -144,7 +156,6 @@ export function ModalEmprestimo({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* Responsividade em width*/}
       <DialogContent
         className="
         w-[95%]           

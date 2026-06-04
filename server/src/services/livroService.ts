@@ -20,21 +20,22 @@ class LivroService {
     if (
       emprestimo.status === Status.Em_andamento ||
       this.isEmprestimoAtrasado(emprestimo)
-    ) { return true; }
+    ) {
+      return true;
+    }
 
     return false;
   }
 
   async createLivro(livro: CreateLivroInput): Promise<LivroResponse> {
     const createdLivro = await livroRepository.create(livro);
-   
+
     return createdLivro;
   }
 
   async getAllLivros(filter?: any): Promise<LivroResponse[]> {
     const filterParsed = {
-      titulo: filter?.titulo ? String(filter.titulo) : undefined,
-      autor: filter?.autor ? String(filter.autor) : undefined,
+      busca: filter?.busca ? String(filter.busca) : undefined,
       categoria: filter?.categoria as Categoria | undefined,
     };
     const livros = await livroRepository.findAll(filterParsed);
@@ -64,9 +65,7 @@ class LivroService {
     return livroAtualizado;
   }
 
-  async deleteLivro(
-    id: string,
-  ): Promise< LivroResponse > {
+  async deleteLivro(id: string): Promise<LivroResponse> {
     const checkLivro = await livroRepository.findById(id);
 
     if (!checkLivro) {
@@ -78,14 +77,12 @@ class LivroService {
     );
 
     if (emprestimoAtivo) {
-      throw new Error(
-        "Não é possível deletar o livro com empréstimos ativos.",
-      );
+      throw new Error("Não é possível deletar o livro com empréstimos ativos.");
     }
 
     const deletedLivro = await livroRepository.delete(id);
 
-    return deletedLivro
+    return deletedLivro;
   }
 }
 export default new LivroService();

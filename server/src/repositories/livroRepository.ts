@@ -4,7 +4,7 @@ import {
   LivroWithEmprestimos,
 } from "src/types";
 import prisma from "@database";
-import { Prisma } from "@prisma/client";
+import { Categoria, Prisma } from "@prisma/client";
 
 class LivroRepository {
   async create(livro: CreateLivroInput): Promise<LivroResponse> {
@@ -16,29 +16,24 @@ class LivroRepository {
     return createdLivroWithoutDate;
   }
 
-  async findAll(filter?: Prisma.LivroWhereInput): Promise<LivroResponse[]> {
+  async findAll(filter?: {
+    busca?: string;
+    categoria?: Categoria;
+  }): Promise<LivroResponse[]> {
     const where: Prisma.LivroWhereInput = {};
-    if (filter?.titulo) {
-      where.titulo = {
-        contains: String(filter.titulo),
-        mode: "insensitive",
-      };
-    }
 
-    if (filter?.autor) {
-      where.autor = {
-        contains: String(filter.autor),
-        mode: "insensitive",
-      };
+    if (filter?.busca) {
+      where.OR = [
+        { titulo: { contains: filter.busca, mode: "insensitive" } },
+        { autor: { contains: filter.busca, mode: "insensitive" } },
+      ];
     }
 
     if (filter?.categoria) {
-      where.categoria = filter.categoria;
+      where.categoria = filter.categoria as Categoria;
     }
 
-    const livros = await prisma.livro.findMany({
-      where,
-    });
+    const livros = await prisma.livro.findMany({ where });
     return livros.map(({ createdAt, ...livro }) => livro);
   }
 

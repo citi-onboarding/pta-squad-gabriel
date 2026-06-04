@@ -40,12 +40,8 @@ class LivroController {
 
   get = async (request: Request, response: Response) => {
     try {
-      const { titulo, autor, categoria } = request.query;
-      const livros = await livroService.getAllLivros({
-        titulo,
-        autor,
-        categoria,
-      });
+      const { busca, categoria } = request.query;
+      const livros = await livroService.getAllLivros({ busca, categoria });
 
       return response.status(200).json(livros);
     } catch (error) {

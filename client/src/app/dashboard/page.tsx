@@ -5,10 +5,23 @@ import CardMetricas from "@/components/CardMetricas";
 import { TabelaEmprestimos } from "@/components/TabelaEmprestimo";
 import GraficoLivros from "@/components/GraficoLivros";
 import { metricasConfig } from "@/config/metricas";
-import { getDashboard, DashboardData } from "@/services/dashboardService";
-import { LivroResumido, Emprestimo } from "@/types";
+import {
+  getDashboard,
+  DashboardData,
+  DashboardLatestLoan,
+} from "@/services/dashboardService";
 import { devolverEmprestimo } from "@/services/emprestimoService";
 import { toast } from "sonner";
+
+type EmprestimoTabela = Pick<
+  DashboardLatestLoan,
+  | "id"
+  | "livro_titulo"
+  | "nome_cliente"
+  | "data_locacao"
+  | "data_prevista_devolucao"
+  | "status"
+>;
 
 export default function DashboardPage() {
   const [dados, setDados] = useState<DashboardData | null>(null);
@@ -29,36 +42,21 @@ export default function DashboardPage() {
     buscar();
   }, []);
 
-  const livrosAdaptados: LivroResumido[] = (dados?.latestLoans ?? []).map(
-    (loan) => ({
-      id: loan.id,
-      titulo: loan.livro,
-      autor: "-",
-      categoria: "Romance",
-      quantidade_total: 0,
-      quantidade_disponivel: 0,
-    }),
-  );
-
   const dadosGrafico = (dados?.booksByCategory ?? []).map((item) => ({
     categoria: item.categoria,
     quantidade: item.quantidade,
   }));
 
-  const emprestimosAdaptados: Record<string, Emprestimo[]> = {};
-  for (const loan of dados?.latestLoans ?? []) {
-    emprestimosAdaptados[loan.id] = [
-      {
-        id: loan.id,
-        livroId: loan.id,
-        nome_cliente: loan.nome_cliente,
-        email_cliente: loan.email_cliente,
-        data_locacao: loan.data_locacao,
-        data_prevista_devolucao: loan.data_prevista_devolucao,
-        status: loan.status as any,
-      },
-    ];
-  }
+  const emprestimosTabela: EmprestimoTabela[] = (dados?.latestLoans ?? []).map(
+    (loan) => ({
+      id: loan.id,
+      livro_titulo: loan.livro_titulo,
+      nome_cliente: loan.nome_cliente,
+      data_locacao: loan.data_locacao,
+      data_prevista_devolucao: loan.data_prevista_devolucao,
+      status: loan.status,
+    }),
+  );
 
   async function handleConfirmarDevolucao(emprestimoId: string) {
     try {
@@ -73,15 +71,24 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <main className="max-w-6xl mx-auto py-8 px-4">
+      <main className="max-w-6xl mx-auto w-full min-w-0 py-8 px-4 overflow-x-hidden">
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
         <p className="text-gray-500 text-sm mt-1">Visão geral da biblioteca</p>
 
         {/* Cards de métricas */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <CardMetricas valor={dados?.metrics.totalBooks ?? 0} {...metricasConfig.totalBooks} />
-          <CardMetricas valor={dados?.metrics.activeLoans ?? 0} {...metricasConfig.activeLoans} />
-          <CardMetricas valor={dados?.metrics.overdueLoans ?? 0} {...metricasConfig.overdueLoans} />
+          <CardMetricas
+            valor={dados?.metrics.totalBooks ?? 0}
+            {...metricasConfig.totalBooks}
+          />
+          <CardMetricas
+            valor={dados?.metrics.activeLoans ?? 0}
+            {...metricasConfig.activeLoans}
+          />
+          <CardMetricas
+            valor={dados?.metrics.overdueLoans ?? 0}
+            {...metricasConfig.overdueLoans}
+          />
         </div>
 
         {/* Gráfico de livros por categoria */}
@@ -106,8 +113,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <TabelaEmprestimos
-              livros={livrosAdaptados}
-              emprestimos={emprestimosAdaptados}
+              emprestimos={emprestimosTabela}
               onConfirmarDevolucao={handleConfirmarDevolucao}
             />
           )}

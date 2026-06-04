@@ -46,7 +46,6 @@ async function groupByLivros(): Promise<{ categoria: string; quantidade: number 
 
 async function findLatestLoans(): Promise<any[]> {
     return await prisma.emprestimo.findMany({
-        take: 5,
         orderBy: {
             data_locacao: 'desc',
         },
