@@ -109,6 +109,10 @@ export default function Livros() {
 
       const novoLivro = await getLivroPorId(emprestimo.livroId);
       setSelectedVerLivro(novoLivro);
+
+      const dados = await getLivros(filtros);
+      setLivros(dados);
+
     } catch (error) {
       toast.error("Erro ao processar devolução. Tente novamente.");
     }
