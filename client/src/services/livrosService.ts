@@ -10,10 +10,8 @@ export async function getLivros(filtros: {
   const params: Record<string, string> = {};
 
   // adiciona os filtros de busca e categoria aos parâmetros da requisição, se eles estiverem preenchidos
-if (filtros.busca) {
-  params.titulo = filtros.busca;
-  params.autor = filtros.busca;
-}
+if (filtros.busca) params.busca = filtros.busca;
+
   if (
     filtros.categoria &&
     filtros.categoria !== "Todas" &&
