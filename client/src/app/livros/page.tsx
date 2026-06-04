@@ -11,7 +11,12 @@ import api from "@/lib/api";
 import { toast } from "sonner";
 
 // tipos
-import { EmprestimoProps, Emprestimo, LivroResumido, Livro } from "@/types/index";
+import {
+  EmprestimoProps,
+  Emprestimo,
+  LivroResumido,
+  Livro,
+} from "@/types/index";
 
 // serviços
 import { getLivros, getLivroPorId } from "@/services/livrosService";
@@ -100,10 +105,10 @@ export default function Livros() {
   async function handleConfirmarDevolucao(emprestimo: Emprestimo) {
     try {
       await devolverEmprestimo(emprestimo.id);
-      toast.success('Livro devolvido com sucesso!');
+      toast.success("Livro devolvido com sucesso!");
 
-      const novoLivro = await getLivroPorId(emprestimo.livroId)
-      setSelectedVerLivro(novoLivro)
+      const novoLivro = await getLivroPorId(emprestimo.livroId);
+      setSelectedVerLivro(novoLivro);
     } catch (error) {
       toast.error("Erro ao processar devolução. Tente novamente.");
     }
@@ -126,7 +131,7 @@ export default function Livros() {
             <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-3 gap-4">
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
             {livrosFiltrados.map((livro) => (
               <Card
                 key={livro.id}
@@ -139,7 +144,7 @@ export default function Livros() {
 
             {/* mensagem caso não tenha nenhum livro */}
             {livrosFiltrados.length === 0 && (
-              <div className="mt-6 flex flex-col items-center justify-center py-16 text-center w-full col-span-3">
+              <div className="mt-6 flex flex-col items-center justify-center py-16 text-center w-full col-span-1 md:col-span-3">
                 <p className="text-gray-500 text-lg font-medium">
                   Nenhum livro encontrado
                 </p>
