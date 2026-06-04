@@ -96,8 +96,7 @@ export function ModalDetalhesLivro({
     try {
       await sendEmail(emprestimo.id);
       toast.success("Lembrete enviado com sucesso!", { id: toastId });
-      } 
-      catch (error) {
+    } catch (error) {
       console.error("Erro ao enviar lembrete:", error);
       toast.error("Erro ao enviar o lembrete.", { id: toastId });
     }
@@ -158,7 +157,7 @@ export function ModalDetalhesLivro({
           </div>
 
           <div className="flex-1 min-w-0 sm:pl-4">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-1 truncate">
+            <h2 className="text-2xl font-semibold text-gray-700 mb-1 whitespace-normal break-words leading-tight">
               {livro.titulo}
             </h2>
             <p className="text-base text-gray-500 mb-2">{livro.autor}</p>
@@ -314,7 +313,10 @@ export function ModalDetalhesLivro({
               <AlertDialogAction
                 className="bg-emerald-500 hover:bg-emerald-600 text-white"
                 onClick={() =>
-                  confirmandoId && handleConfirmarDevolucao(emprestimos.find((e) => e.id === confirmandoId)!)
+                  confirmandoId &&
+                  handleConfirmarDevolucao(
+                    emprestimos.find((e) => e.id === confirmandoId)!,
+                  )
                 }
               >
                 Confirmar

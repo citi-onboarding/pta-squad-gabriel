@@ -1,14 +1,13 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { LivroResumido, Emprestimo, StatusEmprestimo } from "@/types";
+import { StatusEmprestimo } from "@/types";
 import { StatusBadge } from "../StatusBadge";
 import {
   Select,
@@ -33,17 +32,26 @@ import {
 } from "@/components/ui/alert-dialog";
 import { sendEmail } from "@/services/emprestimoService";
 import { toast } from "sonner";
+import type { DashboardLatestLoan } from "@/services/dashboardService";
+
+type EmprestimoTabela = Pick<
+  DashboardLatestLoan,
+  | "id"
+  | "livro_titulo"
+  | "nome_cliente"
+  | "data_locacao"
+  | "data_prevista_devolucao"
+  | "status"
+>;
 
 type TabelaEmprestimoProps = {
-  livros: LivroResumido[];
-  emprestimos: Record<string, Emprestimo[]>;
+  emprestimos: EmprestimoTabela[];
   onConfirmarDevolucao?: (emprestimoId: string) => Promise<void>;
 };
 
 type FilterStatus = StatusEmprestimo | "Todos";
 
 export function TabelaEmprestimos({
-  livros,
   emprestimos,
   onConfirmarDevolucao,
 }: TabelaEmprestimoProps) {
@@ -53,21 +61,15 @@ export function TabelaEmprestimos({
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const livrosMap: Record<string, string> = {};
-  for (const livro of livros) {
-    livrosMap[livro.id] = livro.titulo;
-  }
-
   const formatarData = (data: string) =>
     new Date(data).toLocaleDateString("pt-BR");
 
-  const handleEnviarLembrete = async (emprestimo: Emprestimo) => {
+  const handleEnviarLembrete = async (emprestimo: EmprestimoTabela) => {
     const toastId = toast.loading("Enviando e-mail de lembrete...");
     try {
       await sendEmail(emprestimo.id);
       toast.success("Lembrete enviado com sucesso!", { id: toastId });
-      } 
-      catch (error) {
+    } catch (error) {
       console.error("Erro ao enviar lembrete:", error);
       toast.error("Erro ao enviar o lembrete.", { id: toastId });
     }
@@ -80,15 +82,19 @@ export function TabelaEmprestimos({
     setLoadingId(null);
   };
 
-  const todosEmprestimos: Emprestimo[] = Object.values(emprestimos).flat();
-  const emprestimosFiltrados: Emprestimo[] =
+  const emprestimosFiltrados: EmprestimoTabela[] =
     statusFilter === "Todos" || !statusFilter
-      ? todosEmprestimos
-      : todosEmprestimos.filter((emp) => emp.status === statusFilter);
+      ? emprestimos
+      : emprestimos.filter((emp) => emp.status === statusFilter);
+
+  const emprestimosParaExibir =
+    statusFilter === "Todos" || !statusFilter
+      ? emprestimosFiltrados.slice(0, 5)
+      : emprestimosFiltrados;
 
   return (
     <div className="border rounded-md bg-white px-5 py-4 space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold text-gray-800">
           Últimos Empréstimos
         </h2>
@@ -96,7 +102,7 @@ export function TabelaEmprestimos({
           value={statusFilter}
           onValueChange={(value) => setStatusFilter(value as FilterStatus)}
         >
-          <SelectTrigger className="w-[180px] rounded-xl">
+          <SelectTrigger className="w-full rounded-xl sm:w-[180px]">
             <SelectValue placeholder="Filtrar por status" />
           </SelectTrigger>
           <SelectContent>
@@ -108,8 +114,8 @@ export function TabelaEmprestimos({
         </Select>
       </div>
 
-      <div className="rounded-md border">
-        <Table className="table-fixed w-full">
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[760px] table-fixed w-full">
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="font-semibold w-[20%] whitespace-nowrap overflow-hidden text-slate-950 text-ellipsis">
@@ -130,7 +136,7 @@ export function TabelaEmprestimos({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {emprestimosFiltrados.length === 0 ? (
+            {emprestimosParaExibir.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -140,10 +146,10 @@ export function TabelaEmprestimos({
                 </TableCell>
               </TableRow>
             ) : (
-              emprestimosFiltrados.map((emp) => (
+              emprestimosParaExibir.map((emp) => (
                 <TableRow key={emp.id}>
                   <TableCell className="font-medium w-[20%] whitespace-nowrap overflow-hidden text-ellipsis">
-                    {livrosMap[emp.livroId] ?? "Livro não encontrado"}
+                    {emp.livro_titulo}
                   </TableCell>
                   <TableCell className="w-[20%] whitespace-nowrap overflow-hidden text-ellipsis">
                     {emp.nome_cliente}
@@ -155,11 +161,11 @@ export function TabelaEmprestimos({
                     {formatarData(emp.data_prevista_devolucao)}
                   </TableCell>
                   <TableCell className="w-[30%]">
-                    <div className="grid w-full grid-cols-1 gap-0.5 sm:grid-cols-[auto_auto] sm:items-center sm:min-h-8">
+                    <div className="flex items-center gap-2 justify-start min-h-8">
                       <div className="shrink-0 flex items-center justify-start">
                         <StatusBadge status={emp.status} />
                       </div>
-                      <div className="flex items-center gap-0.5 justify-center sm:justify-start h-8 min-w-0">
+                      <div className="flex items-center gap-0.5 justify-start h-8 min-w-0">
                         {emp.status === "Em_andamento" && (
                           <Button
                             size="sm"
