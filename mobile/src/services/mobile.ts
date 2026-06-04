@@ -1,4 +1,7 @@
-export const getEmprestimos = async (filtros: {
-  busca: string;
-}): Promise<Emprestimo[]> => {
-  const params: Record<string, string> = {};
+import { EmprestimoWithCliente } from "../types";
+import api from "../lib/api";
+
+export async function getEmprestimos (filtros: { busca: string; }): Promise<EmprestimoWithCliente[]> {
+  const response = await api.get("/emprestimos", { params: filtros });
+  return response.data;
+}

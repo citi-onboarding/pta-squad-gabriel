@@ -87,12 +87,17 @@ class EmprestimoService {
       await emprestimoRepository.findEmprestimosByCliente(cliente);
 
     const hoje = new Date();
-    const resultado = emprestimos.map((e) => ({
-      ...e,
+    const resultado = emprestimos.map((emp) => ({
+      id: emp.id,
+      nome_cliente: emp.nome_cliente,
+      data_locacao: emp.data_locacao,
+      data_prevista_devolucao: emp.data_prevista_devolucao,
       status:
-        e.status !== Status.Devolvido && e.data_prevista_devolucao < hoje
+        emp.status !== Status.Devolvido && emp.data_prevista_devolucao < hoje
           ? Status.Atrasado
-          : e.status,
+          : emp.status,
+      titulo_livro: emp.livro.titulo,
+      foto_url: emp.livro.foto_url,
     }));
     return resultado;
   }
