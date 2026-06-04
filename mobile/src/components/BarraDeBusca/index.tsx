@@ -18,10 +18,6 @@ export default function BarraDeBusca({ onBuscar }: BarraDeBuscaProps) {
 
   const handleBuscar = async () => {
     const termoBusca = busca.trim();
-
-    if (termoBusca === "") {
-      return;
-    }
     await onBuscar(termoBusca);
   };
 

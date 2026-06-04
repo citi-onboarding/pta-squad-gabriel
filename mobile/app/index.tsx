@@ -25,6 +25,10 @@ export default function MeusEmprestimosScreen() {
   const handleBuscar = async (nomeCliente: string) => {
     try {
       setLoading(true);
+      if (nomeCliente.trim() === "") {
+        setEmprestimos([]);
+        return;
+      }
       const dados = await getEmprestimos(nomeCliente);
       setEmprestimos(dados);
     } catch (err) {
