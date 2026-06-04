@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { Text, StyleSheet, FlatList } from "react-native";
 // Componentes
 import HeaderMobile from "../src/components/Header";
 import BarraDeBusca from "../src/components/BarraDeBusca";
@@ -7,51 +7,31 @@ import CardEmprestimo from "../src/components/Card";
 import ThemeProviderView from "../src/components/ThemeProvider";
 // Services
 import { getEmprestimos } from "../src/services/mobile";
-// Tipos e dados mockados
-type StatusEmprestimo = "Em_andamento" | "Devolvido" | "Atrasado";
-
-// Interface para representar um empréstimo
-interface Emprestimo {
-  id: string;
-  nomeCliente: string;
-  tituloLivro: string;
-  status: StatusEmprestimo;
-  dataLocacao: string;
-  dataDevolucao: string;
-  imagemUri?: string;
-}
-
-useEffect(() => {
-    async function buscar() {
-      try {
-        setLoading(true);
-        const dados = await getEmprestimos(filtros);
-        setEmprestimos(dados);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    buscar();
-  }, [filtros]);
+// Tipos
+import { EmprestimoWithCliente } from "../src/types/index";
 
 // Tela principal para exibir os empréstimos do usuário
 export default function MeusEmprestimosScreen() {
   // Estado para armazenar os empréstimos exibidos, inicialmente vazia
-  const [emprestimos, setEmprestimos] = useState<Emprestimo[] | null>(null);
+  const [emprestimos, setEmprestimos] = useState<
+    EmprestimoWithCliente[] | null
+  >(null);
+  const [loading, setLoading] = useState(false);
 
-  // Função para normalizar texto, removendo acentos e convertendo para minúsculas
-  const normalizar = (texto: string) =>
-    texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
+  const formatarData = (valor: string | Date) =>
+    new Date(valor).toLocaleDateString("pt-BR");
 
   // Função para filtrar os empréstimos com base na busca do usuário
   const handleBuscar = async (nomeCliente: string) => {
-    const filtrado = emprestimosRaw.filter((e) =>
-      normalizar(e.nomeCliente).includes(normalizar(nomeCliente))
-    );
-    setEmprestimos(filtrado);
+    try {
+      setLoading(true);
+      const dados = await getEmprestimos(nomeCliente);
+      setEmprestimos(dados);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,11 +57,11 @@ export default function MeusEmprestimosScreen() {
         renderItem={({ item }) => (
           // Renderiza um card para cada empréstimo na lista
           <CardEmprestimo
-            tituloLivro={item.tituloLivro}
+            tituloLivro={item.titulo_livro}
             status={item.status}
-            dataLocacao={item.dataLocacao}
-            dataDevolucao={item.dataDevolucao}
-            imagemUri={item.imagemUri}
+            dataLocacao={formatarData(item.data_locacao)}
+            dataDevolucao={formatarData(item.data_prevista_devolucao)}
+            imagemUri={item.foto_url || undefined}
           />
         )}
       />
