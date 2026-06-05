@@ -1,90 +1,41 @@
-
 import React, { useState } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { Text, StyleSheet, FlatList } from "react-native";
 // Componentes
 import HeaderMobile from "../src/components/Header";
 import BarraDeBusca from "../src/components/BarraDeBusca";
 import CardEmprestimo from "../src/components/Card";
 import ThemeProviderView from "../src/components/ThemeProvider";
-// Tipos e dados mockados
-type StatusEmprestimo = "Em_andamento" | "Devolvido" | "Atrasado";
-
-// Interface para representar um empréstimo
-interface Emprestimo {
-  id: string;
-  nomeCliente: string;
-  tituloLivro: string;
-  status: StatusEmprestimo;
-  dataLocacao: string;
-  dataDevolucao: string;
-  imagemUri?: string;
-}
-
-// Dados mockados de empréstimos para demonstração
-const EMPRESTIMOS_MOCK: Emprestimo[] = [
-  {
-    id: "1",
-    nomeCliente: "João Silva",
-    tituloLivro: "Dom Casmurro",
-    status: "Devolvido",
-    dataLocacao: "22/03/2026",
-    dataDevolucao: "12/03/2026",
-    imagemUri: "https://m.media-amazon.com/images/I/61x1ZHomWUL.jpg",
-  },
-  {
-    id: "2",
-    nomeCliente: "João Silva",
-    tituloLivro: "Clean Code",
-    status: "Em_andamento",
-    dataLocacao: "15/04/2026",
-    dataDevolucao: "30/04/2026",
-    imagemUri: "https://m.media-amazon.com/images/I/71nj3JM-igL.jpg",
-  },
-  {
-    id: "3",
-    nomeCliente: "Maria Souza",
-    tituloLivro: "História do Brasil",
-    status: "Atrasado",
-    dataLocacao: "01/03/2026",
-    dataDevolucao: "15/03/2026",
-    imagemUri: "https://m.media-amazon.com/images/I/714FRIRxxkL._AC_UF1000,1000_QL80_.jpg",
-  },
-  {
-    id: "4",
-    nomeCliente: "Carlos Lima",
-    tituloLivro: "Introdução à Ciência",
-    status: "Em_andamento",
-    dataLocacao: "20/04/2026",
-    dataDevolucao: "05/05/2026",
-    imagemUri: "https://livraria.ufsc.br/DynamicItems/Catalog/010d1781-43e1-41f6-b893-be37d02321a69788532807908_W270.jpg",
-  },
-  {
-    id: "5",
-    nomeCliente: "Maria Souza",
-    tituloLivro: "O Pequeno Príncipe",
-    status: "Devolvido",
-    dataLocacao: "10/03/2026",
-    dataDevolucao: "25/03/2026",
-    imagemUri: "https://upload.wikimedia.org/wikipedia/pt/4/47/O-pequeno-príncipe.jpg",
-  },
-];
+// Services
+import { getEmprestimos } from "../src/services/mobile";
+// Tipos
+import { EmprestimoWithCliente } from "../src/types/index";
 
 // Tela principal para exibir os empréstimos do usuário
 export default function MeusEmprestimosScreen() {
   // Estado para armazenar os empréstimos exibidos, inicialmente vazia
-  const [emprestimos, setEmprestimos] = useState<Emprestimo[] | null>(null);
+  const [emprestimos, setEmprestimos] = useState<
+    EmprestimoWithCliente[] | null
+  >(null);
+  const [loading, setLoading] = useState(false);
 
-  // Função para normalizar texto, removendo acentos e convertendo para minúsculas
-  const normalizar = (texto: string) =>
-    texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
+  const formatarData = (valor: string | Date) =>
+    new Date(valor).toLocaleDateString("pt-BR");
 
   // Função para filtrar os empréstimos com base na busca do usuário
   const handleBuscar = async (nomeCliente: string) => {
-    const filtrado = EMPRESTIMOS_MOCK.filter((e) =>
-      normalizar(e.nomeCliente).includes(normalizar(nomeCliente))
-    );
-    setEmprestimos(filtrado);
+    try {
+      setLoading(true);
+      if (nomeCliente.trim() === "") {
+        setEmprestimos([]);
+        return;
+      }
+      const dados = await getEmprestimos(nomeCliente);
+      setEmprestimos(dados);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -96,10 +47,12 @@ export default function MeusEmprestimosScreen() {
       {/* Barra de busca */}
       <BarraDeBusca onBuscar={handleBuscar} />
 
-      {/* Texto de resultado */}
-      <Text style={styles.resultadoTexto}>
-        {emprestimos ? emprestimos.length : 0} empréstimo(s) encontrado(s)
-      </Text>
+      {/* Texto de resultado — só aparece depois da primeira busca */}
+      {emprestimos !== null && (
+        <Text style={styles.resultadoTexto}>
+          {emprestimos.length} empréstimo(s) encontrado(s)
+        </Text>
+      )}
 
       {/* Lista de empréstimos */}
       <FlatList
@@ -110,13 +63,18 @@ export default function MeusEmprestimosScreen() {
         renderItem={({ item }) => (
           // Renderiza um card para cada empréstimo na lista
           <CardEmprestimo
-            tituloLivro={item.tituloLivro}
+            tituloLivro={item.livro.titulo}
             status={item.status}
-            dataLocacao={item.dataLocacao}
-            dataDevolucao={item.dataDevolucao}
-            imagemUri={item.imagemUri}
+            dataLocacao={formatarData(item.data_locacao)}
+            dataDevolucao={formatarData(item.data_prevista_devolucao)}
+            imagemUri={item.livro.foto_url || undefined}
           />
         )}
+        ListEmptyComponent={
+          emprestimos !== null && !loading ? (
+            <Text style={styles.vazio}>Nenhum empréstimo encontrado.</Text>
+          ) : null
+        }
       />
     </ThemeProviderView>
   );
@@ -135,5 +93,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 8,
     paddingBottom: 24,
+  },
+  vazio: {
+    textAlign: "center",
+    color: "#9ca3af",
+    fontSize: 14,
+    paddingTop: 32,
   },
 });
