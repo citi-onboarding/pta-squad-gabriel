@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Text, StyleSheet, FlatList } from "react-native";
 // Componentes
 import HeaderMobile from "../src/components/Header";
@@ -47,10 +47,12 @@ export default function MeusEmprestimosScreen() {
       {/* Barra de busca */}
       <BarraDeBusca onBuscar={handleBuscar} />
 
-      {/* Texto de resultado */}
-      <Text style={styles.resultadoTexto}>
-        {emprestimos ? emprestimos.length : 0} empréstimo(s) encontrado(s)
-      </Text>
+      {/* Texto de resultado — só aparece depois da primeira busca */}
+      {emprestimos !== null && (
+        <Text style={styles.resultadoTexto}>
+          {emprestimos.length} empréstimo(s) encontrado(s)
+        </Text>
+      )}
 
       {/* Lista de empréstimos */}
       <FlatList
@@ -61,13 +63,18 @@ export default function MeusEmprestimosScreen() {
         renderItem={({ item }) => (
           // Renderiza um card para cada empréstimo na lista
           <CardEmprestimo
-            tituloLivro={item.titulo_livro}
+            tituloLivro={item.livro.titulo}
             status={item.status}
             dataLocacao={formatarData(item.data_locacao)}
             dataDevolucao={formatarData(item.data_prevista_devolucao)}
-            imagemUri={item.foto_url || undefined}
+            imagemUri={item.livro.foto_url || undefined}
           />
         )}
+        ListEmptyComponent={
+          emprestimos !== null && !loading ? (
+            <Text style={styles.vazio}>Nenhum empréstimo encontrado.</Text>
+          ) : null
+        }
       />
     </ThemeProviderView>
   );
@@ -86,5 +93,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 8,
     paddingBottom: 24,
+  },
+  vazio: {
+    textAlign: "center",
+    color: "#9ca3af",
+    fontSize: 14,
+    paddingTop: 32,
   },
 });
