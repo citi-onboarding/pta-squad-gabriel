@@ -54,8 +54,8 @@ class EmprestimoRepository {
       where: cliente
         ? {
             nome_cliente: {
-              equals: String(cliente),
-              mode: "insensitive", // busca case-insensitive
+              contains: String(cliente),
+              mode: "insensitive", // busca parcial e case-insensitive
             },
           }
         : undefined,

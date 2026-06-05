@@ -63,11 +63,11 @@ export default function MeusEmprestimosScreen() {
         renderItem={({ item }) => (
           // Renderiza um card para cada empréstimo na lista
           <CardEmprestimo
-            tituloLivro={item.livro.titulo}
+            tituloLivro={item.titulo_livro}
             status={item.status}
             dataLocacao={formatarData(item.data_locacao)}
             dataDevolucao={formatarData(item.data_prevista_devolucao)}
-            imagemUri={item.livro.foto_url || undefined}
+            imagemUri={item.foto_url || undefined}
           />
         )}
         ListEmptyComponent={
