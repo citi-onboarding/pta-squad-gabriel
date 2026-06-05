@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CriarLivroDTO, Categoria } from "@/types";
 import { toast } from "sonner";
+import { UploadIcon } from "lucide-react";
+import { uploadImagem } from "@/services/imgbbService";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,6 +56,9 @@ export default function CadastrarLivro({
     foto_url: "",
   });
 
+  // estado para controlar o loading do upload
+  const [uploading, setUploading] = useState(false);
+
   //Função para atualizar o estado do formulário
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -64,6 +69,23 @@ export default function CadastrarLivro({
       valorFiltrado = value.replace(/\D/g, "");
     }
     setForm({ ...form, [name]: valorFiltrado });
+  }
+
+  // função para fazer upload da imagem e preencher o campo foto_url automaticamente
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+
+    try {
+      setUploading(true);
+      const url = await uploadImagem(arquivo);
+      setForm((prev) => ({ ...prev, foto_url: url }));
+      toast.success("Imagem enviada com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao fazer upload da imagem.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   function handleCategoriaChange(value: Categoria) {
@@ -376,13 +398,35 @@ export default function CadastrarLivro({
             <Label className="text-sm font-medium text-gray-900">
               URL da Foto (opcional)
             </Label>
-            <Input
-              name="foto_url"
-              value={form.foto_url}
-              onChange={handleChange}
-              placeholder="https://exemplo.com/capa.jpg"
-              className="mt-1"
-            />
+            {/* campo de URL e botão de upload lado a lado */}
+            <div className="flex gap-2 mt-1">
+              <Input
+                name="foto_url"
+                value={form.foto_url}
+                onChange={handleChange}
+                placeholder="https://exemplo.com/capa.jpg"
+                className="flex-1"
+              />
+              {/* input file oculto — ativado pelo botão abaixo */}
+              <input
+                type="file"
+                accept="image/*"
+                id="upload-imagem"
+                className="hidden"
+                onChange={handleUpload}
+              />
+              {/* botão que abre o seletor de arquivo */}
+              <Button
+                type="button"
+                variant="outline"
+                disabled={uploading}
+                onClick={() => document.getElementById("upload-imagem")?.click()}
+                className="border border-emerald-500 text-emerald-600 hover:bg-emerald-50 whitespace-nowrap"
+              >
+                <UploadIcon className="w-4 h-4 mr-2" />
+                {uploading ? "Enviando..." : "Importar imagem"}
+              </Button>
+            </div>
             <p
               className={`text-red-500 text-xs mt-1 ${
                 erros.foto_url ? "visible" : "invisible"
