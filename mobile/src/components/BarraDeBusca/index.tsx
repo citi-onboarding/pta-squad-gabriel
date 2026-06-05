@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react-native";
 
 interface BarraDeBuscaProps {
@@ -15,6 +15,21 @@ interface BarraDeBuscaProps {
 
 export default function BarraDeBusca({ onBuscar }: BarraDeBuscaProps) {
   const [busca, setBusca] = useState("");
+
+  const onBuscarRef = useRef(onBuscar);
+  onBuscarRef.current = onBuscar;
+
+  // busca enquanto digita
+  useEffect(() => {
+    const termoBusca = busca.trim();
+    if (termoBusca === "") return;
+
+    const timeout = setTimeout(() => {
+      onBuscarRef.current(termoBusca);
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [busca]);
 
   const handleBuscar = async () => {
     const termoBusca = busca.trim();
